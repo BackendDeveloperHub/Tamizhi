@@ -36,7 +36,7 @@ Tamizhi/
 🛠 நிறுவும் முறை (Installation)
 ​தற்போது இது உருவாக்கத்தில் (Development) உள்ளது. உங்கள் லினக்ஸ் கணினியில் கம்பைலரை உருவாக்க:
 
-git clone https://github.com/yourusername/tamizhi.git
+git clone https://github.com/prabakaran202/tamizhi.git
 cd tamizhi
 make
 
