@@ -42,17 +42,55 @@ Token get_next_token(FILE *file) {
     }
 
     // Unicode & Identifier handling
+    Token get_next_token(FILE *file) {
+    Token token;
+    int c = fgetc(file);
+    while (isspace(c)) c = fgetc(file);
+
+    if (c == EOF) {
+        token.type = T_EOF;
+        return token;
+    }
+
+    // 1. Identifiers & Tamil Keywords (Already neenga vachiruping)
     if (isalpha(c) || c > 127) {
         int i = 0;
         do {
             token.value[i++] = c;
             c = fgetc(file);
-        } while (isalnum(c) || c > 127);
+        } while (isalnum(c) || c > 127 || c == '2'); // '2' ah allow panna (ஆ2, சு2)
         ungetc(c, file);
         token.value[i] = '\0';
         token.type = get_keyword_type(token.value);
         return token;
     }
+
+    // 2. Symbols Handling (Ippo neenga ketta logic - Itha thaan add pannanum)
+    token.value[0] = c;
+    token.value[1] = '\0';
+
+    if (c == '=') { token.type = T_ID; return token; }
+    if (c == ';') { token.type = T_ID; return token; }
+    if (c == '(') { token.type = T_ID; return token; }
+    if (c == ')') { token.type = T_ID; return token; }
+    if (c == '{') { token.type = T_ID; return token; }
+    if (c == '}') { token.type = T_ID; return token; }
+
+    // 3. Numbers Handling
+    if (isdigit(c)) {
+        int i = 0;
+        while (isdigit(c)) {
+            token.value[i++] = c;
+            c = fgetc(file);
+        }
+        ungetc(c, file);
+        token.value[i] = '\0';
+        token.type = T_NUM;
+        return token;
+    }
+
+    return token;
+}
 
     // Symbols handling (Ithaiyum add pannunga)
     if (c == '=') {
