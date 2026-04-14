@@ -4,7 +4,13 @@
 #include <ctype.h> // Itha extra-va add pannunga (isspace-ku thevai)
 
 // 1. Enums (Already iruku)
-typedef enum { ... } T_Type;
+typedef enum {
+    T_INT, T_STR, T_FLT, T_BOOL,      // எ, வ, பு, உ
+    T_IF, T_ELSE, T_FOR, T_WHILE,     // ஆ2, இ, சு, சு2
+    T_RET, T_FUNC, T_PRINT,           // த, செயல், கூறு
+    T_INP, T_IMP, T_ID, T_NUM, T_EOF  // கேள், சேர், identifiers, end of file
+} T_Type;
+
 
 // 2. Token Struct (Puthusa paste pannunga)
 typedef struct {
