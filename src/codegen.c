@@ -8,10 +8,10 @@ LLVMModuleRef module;
 LLVMBuilderRef builder;
 
 void tamizhi_codegen_init() {
-    // 1. Module create pannuvom (Intha file-oda name)
+    // 1. Module create pannuvom
     module = LLVMModuleCreateWithName("tamizhi_engine");
 
-    // 2. Builder create pannuvom (Instructions ezhutha ithu thaan venum)
+    // 2. Builder create pannuvom
     builder = LLVMCreateBuilder();
 
     printf("[Codegen] LLVM Engine initialized successfully on your phone!\n");
@@ -31,11 +31,17 @@ void tamizhi_generate_entry() {
 }
 
 void tamizhi_codegen_finish() {
-    // 5. Code-a verify panni print pannanum
+    // 5. TERMINATOR: Function-a mudikka 'return 0' add pannuvom
+    // Ithu illama thaan pona vaati error vandhuchi
+    LLVMValueRef ret_val = LLVMConstInt(LLVMInt32Type(), 0, 0);
+    LLVMBuildRet(builder, ret_val); 
+
+    // 6. Code-a verify pannanum
     char *error = NULL;
     LLVMVerifyModule(module, LLVMAbortProcessAction, &error);
-    
-    // Inga thaan unga code IR-a (Intermediate Representation) screen-la kaatum
+
+    // 7. Inga thaan unga Native IR screen-la print aagum
+    printf("\n--- Generated LLVM IR ---\n");
     LLVMDumpModule(module);
 
     // Clean up
