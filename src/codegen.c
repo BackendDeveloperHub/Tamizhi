@@ -17,7 +17,7 @@ void tamizhi_generate_entry() {
     // Standard 32-bit Integer return type (main return type)
     LLVMTypeRef return_type = LLVMInt32Type();
     LLVMTypeRef main_func_type = LLVMFunctionType(return_type, NULL, 0, 0);
-    LLVMValueRef main_func = LLVMAddFunction(module, "tamizhi_main", main_func_type);
+    LLVMValueRef main_func = LLVMAddFunction(module, "main", main_func_type);
 
     // --- CRITICAL FOR ANDROID/TERMUX LINKING ---
     LLVMSetFunctionCallConv(main_func, LLVMCCallConv); 
