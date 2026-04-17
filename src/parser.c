@@ -45,12 +45,12 @@ void parse(FILE *file) {
             Token close_p = get_next_token(file); // ')'
             Token p_semi = get_next_token(file);  // ';'
 
-            printf("stderr,[Parser] Print Statement Detect: %s\n", p_name.value);
-        }
+            printf(stderr,"[Parser] Print Statement Detect: %s\n", p_name.value);
+        }-
 
         // 3. 'சு' (Loop) handle pannuvom
         else if (strcmp(t.value, "சு") == 0) {
-            printf("stderr,[Parser] Loop detected! Triggering 1M Loop Test...\n");
+            printf(stderr,"[Parser] Loop detected! Triggering 1M Loop Test...\n");
             tamizhi_gen_loop_test(1000000);
         }
     }
