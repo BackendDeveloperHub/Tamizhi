@@ -10,7 +10,7 @@ LLVMBuilderRef builder;
 void tamizhi_codegen_init() {
     module = LLVMModuleCreateWithName("tamizhi_engine");
     builder = LLVMCreateBuilder();
-   // printf("[Codegen] LLVM Engine initialized successfully on your phone!\n");
+   // printf("stderr, [Codegen] LLVM Engine initialized successfully on your phone!\n");
 }
 
 void tamizhi_generate_entry() {
@@ -25,14 +25,14 @@ void tamizhi_generate_entry() {
 
     LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main_func, "entry");
     LLVMPositionBuilderAtEnd(builder, entry);
-    printf("[Codegen] Main function entry point created with public visibility.\n");
+    printf("stderr,[Codegen] Main function entry point created with public visibility.\n");
 }
 
 void tamizhi_gen_var_decl(char* name, int initial_value) {
     LLVMValueRef alloca = LLVMBuildAlloca(builder, LLVMInt32Type(), name);
     LLVMValueRef val = LLVMConstInt(LLVMInt32Type(), initial_value, 0);
     LLVMBuildStore(builder, val, alloca);
-    printf("[Codegen] Variable '%s' created.\n", name);
+    printf("stderr,[Codegen] Variable '%s' created.\n", name);
 }
 
 void tamizhi_gen_loop_test(int limit) {
