@@ -45,7 +45,7 @@ void parse(FILE *file) {
             Token close_p = get_next_token(file); // ')'
             Token p_semi = get_next_token(file);  // ';'
 
-            printf("[Parser] Print Statement Detect: %s\n", p_name.value);
+            printf("stderr,[Parser] Print Statement Detect: %s\n", p_name.value);
         }
 
         // 3. 'சு' (Loop) handle pannuvom
