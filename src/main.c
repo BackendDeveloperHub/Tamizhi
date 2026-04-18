@@ -28,6 +28,15 @@ int main(int argc, char *argv[]) {
     parse(file); 
 
     // 3. Finalize and Output IR
+    // codegen.c kulla
+ void tamizhi_codegen_finish() {
+    LLVMDumpModule(module); // Ithu terminal-la mattum kaattum
+    // Namma file-ku anuppa ithu venum:
+    char *ir = LLVMPrintModuleToString(module);
+    printf("%s", ir); 
+    LLVMDisposeMessage(ir);
+}
+
     tamizhi_codegen_finish();
 
     fclose(file);
