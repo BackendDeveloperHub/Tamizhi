@@ -25,7 +25,7 @@ void parse(FILE *file) {
             Token val = get_next_token(file);    // Value (e.g., '100')
             Token semi = get_next_token(file);   // ';'
 
-            printf("stderr,[Parser] Variable Declaration Detect: %s = %s\n", name.value, val.value);
+            fprintf(stderr,"[Parser] Variable Declaration Detect: %s = %s\n", name.value, val.value);
 
             // AST Node creation (Good for structure)
             ASTNode* var_node = create_node(NODE_VAR_DECL, name);
@@ -45,7 +45,7 @@ void parse(FILE *file) {
             Token close_p = get_next_token(file); // ')'
             Token p_semi = get_next_token(file);  // ';'
 
-            printf(stderr,"[Parser] Print Statement Detect: %s\n", p_name.value);
+            fprintf(stderr,"[Parser] Print Statement Detect: %s\n", p_name.value);
         }-
 
         // 3. 'சு' (Loop) handle pannuvom
