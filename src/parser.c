@@ -46,7 +46,7 @@ void parse(FILE *file) {
             Token p_semi = get_next_token(file);  // ';'
 
             fprintf(stderr,"[Parser] Print Statement Detect: %s\n", p_name.value);
-        }-
+        }
 
         // 3. 'சு' (Loop) handle pannuvom
          else if (strcmp(t.value, "சு") == 0) {
