@@ -70,20 +70,26 @@ void tamizhi_gen_loop_test(int limit) {
     fprintf(stderr,"[Codegen] 1 Million Loop logic generated.\n");
 }
 
-void tamizhi_gen_print(char* var_name) {
-    // 1. Get the printf function from module
-    LLVMValueRef printf_func = LLVMGetNamedFunction(module, "printf");
-    
-    // 2. Create a format string (e.g., "%d\n")
-    LLVMValueRef format_str = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
-    
-    // 3. Load the variable value
-    LLVMValueRef var_ptr = LLVMGetNamedGlobal(module, var_name); // Note: Fix if using alloca
-    // For simplicity, let's assume we load from current scope
-    // LLVMValueRef val = LLVMBuildLoad2(builder, LLVMInt32Type(), var_ptr, "print_val");
 
-    // 4. Call printf
-    LLVMValueRef args[] = { format_str,var_ptr};
+void tamizhi_gen_print(char* var_name) {
+    // 1. Get printf and format string
+    LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
+
+    // 2. Loop variable 'i' ah memory-la irundhu search pannanum
+    LLVMValueRef main_func = LLVMGetBasicBlockParent(LLVMGetInsertBlock(builder));
+    LLVMValueRef var_ptr = LLVMGetValueByName(main_func, "i"); // 'i' is the loop variable
+
+    if (!var_ptr) {
+        fprintf(stderr, "[Error] Variable 'i' not found for printing!\n");
+        return;
+    }
+
+    // 3. Load the actual value from memory address
+    LLVMValueRef val = LLVMBuildLoad2(builder, LLVMInt32Type(), var_ptr, "load_val");
+
+    // 4. Call printf properly
+    LLVMValueRef args[] = { fmt, val };
+    // MUKKIYAM: Global 'printf_type' and 'printf_func' use pannanum
     LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
 }
 
