@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 extern LLVMModuleRef module; 
 
 // 2. Function Definition (Clean and Outside main)
-void tamizhi_codegen_finish() {
+/*void tamizhi_codegen_finish() {
     if (module == NULL) {
         fprintf(stderr, "Error: LLVM Module initialization fail aayiduchi!\n");
         return;
@@ -113,7 +113,7 @@ void tamizhi_codegen_finish() {
         fprintf(stderr, "%s", ir); 
         LLVMDisposeMessage(ir);
     }
-}
+}*/
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
