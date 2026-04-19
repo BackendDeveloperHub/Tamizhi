@@ -6,7 +6,7 @@
 // LLVM Global variables
 LLVMModuleRef module;
 LLVMBuilderRef builder;
-
+LLVMTypeRef printf_type;
 void tamizhi_codegen_init() {
     module = LLVMModuleCreateWithName("tamizhi_engine");
     builder = LLVMCreateBuilder();
