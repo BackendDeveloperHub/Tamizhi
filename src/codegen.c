@@ -14,7 +14,8 @@ void tamizhi_codegen_init() {
    
     LLVMTypeRef printf_args[] = { LLVMPointerType(LLVMInt8Type(), 0) }; // format string
     LLVMTypeRef printf_type = LLVMFunctionType(LLVMInt32Type(), printf_args, 1, 1);
-    LLVMValueRef printf_func = LLVMAddFunction(module, "printf", printf_type);
+    //LLVMValueRef printf_func = LLVMAddFunction(module, "printf", printf_type);
+     printf_func = LLVMAddFunction(module, "printf", printf_type);
     
     fprintf(stderr," [Codegen] LLVM Engine initialized successfully on your phone!\n");
 
