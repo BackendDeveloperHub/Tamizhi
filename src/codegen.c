@@ -61,16 +61,28 @@ void tamizhi_gen_loop_test(int limit) {
     LLVMPositionBuilderAtEnd(builder, after_block);
     fprintf(stderr,"[Codegen] 1 Million Loop logic generated.\n");
 }
-
 void tamizhi_codegen_finish() {
+    // 1. Return 0 for main function
     LLVMValueRef ret_val = LLVMConstInt(LLVMInt32Type(), 0, 0);
     LLVMBuildRet(builder, ret_val); 
 
+    // 2. Verify module
     char *error = NULL;
-    LLVMVerifyModule(module, LLVMAbortProcessAction, &error);
+    LLVMVerifyModule(module, LLVMPrintMessageAction, &error);
+    if (error) {
+        fprintf(stderr, "[Error] LLVM Verification failed: %s\n", error);
+        LLVMDisposeMessage(error);
+    }
 
-    fprintf(stderr,"\n--- Generated LLVM IR ---\n");
-    LLVMDumpModule(module);
+    // 3. Output logic - ITHU THAAN MUKKIYAM!
+    // Terminal-la debug panna Dump pannuvom (Stderr)
+    fprintf(stderr, "\n--- Generating LLVM IR ---\n");
+    LLVMDumpModule(module); 
+
+    // File-kulla anuppa stdout-ku print pannanum
+    char *ir_string = LLVMPrintModuleToString(module);
+    printf("%s", ir_string); // <--- Ithu thaan loop.ll kulla code-ah anuppum
+    LLVMDisposeMessage(ir_string);
 
     LLVMDisposeBuilder(builder);
 }
