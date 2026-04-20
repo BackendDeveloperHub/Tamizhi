@@ -166,7 +166,7 @@ void parse(FILE *file) {
             // ஒருவேளை ')' இருந்தால் அதையும் தாண்டுவோம் (Syntax தூய்மைக்காக)
             Token next = get_next_token(file);
             if (!(next.type == 16 || strcmp(next.value, ")") == 0)) {
-                ungetc_token(next, file); // இது இல்லை என்றால் பரவாயில்லை, t-ஐ அப்படியே விடலாம்
+                //ungetc_token(next, file); // இது இல்லை என்றால் பரவாயில்லை, t-ஐ அப்படியே விடலாம்
             }
             continue;
         }
