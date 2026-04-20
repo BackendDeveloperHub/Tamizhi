@@ -70,8 +70,22 @@ void tamizhi_gen_loop_test(int limit) {
     LLVMPositionBuilderAtEnd(builder, after_block);
     fprintf(stderr,"[Codegen] 1 Million Loop logic generated.\n");
 }
+void tamizhi_gen_print(char* var_name) {
+    // 1. Get printf and format string
+    LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
 
+    // 2. IMPORTANT: Namma mela declare panna Global 'i_ptr'-ah direct-ah use pannuvom
+    // Intha LLVMGetValueByName variya full-ah remove pannidunga
+    
+    // 3. Load the actual value from the pointer
+    LLVMValueRef val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
 
+    // 4. Call printf properly
+    LLVMValueRef args[] = { fmt, val };
+    LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
+}
+
+/*
 void tamizhi_gen_print(char* var_name) {
     // 1. Get printf and format string
     LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
@@ -93,7 +107,7 @@ void tamizhi_gen_print(char* var_name) {
     // MUKKIYAM: Global 'printf_type' and 'printf_func' use pannanum
     LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
 }
-
+*/
 void tamizhi_codegen_finish() {
     // 1. Return 0 for main function
     LLVMValueRef ret_val = LLVMConstInt(LLVMInt32Type(), 0, 0);
