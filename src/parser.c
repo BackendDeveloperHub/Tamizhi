@@ -29,21 +29,39 @@ void parse(FILE *file) {
             continue;
         }
 
+        // --- 'சு' (Loop - ஸ்பீடு டெஸ்ட் செய்ய) ---
+        else if (t.type == T_FOR || strcmp(t.value, "சு") == 0) {
+            fprintf(stderr, "[Parser] Loop detection started...\n");
+
+            // லூப் லிமிட் (எண்) கிடைக்கும் வரை தேடுவோம்
+            while ((t = get_next_token(file)).type != T_NUM && t.type != T_EOF);
+            
+            if (t.type == T_NUM) {
+                int limit = atoi(t.value);
+                fprintf(stderr, "[Parser] Loop limit set to: %d\n", limit);
+                
+                // codegen.c-ல் இருக்கும் LLVM Loop லாஜிக்கை இங்க கூப்பிடுறோம்
+                tamizhi_gen_loop_test(limit);
+            }
+            
+            // லூப் பாடியைத் தாண்ட (தற்போதைக்கு ஸ்கிப் செய்வோம்)
+            while ((t = get_next_token(file)).type != 22 && t.type != T_EOF);
+            skip_block(file);
+            continue;
+        }
+
         // --- 'இயக்கு' (Execution Block) ---
         else if (t.type == T_CALL || strcmp(t.value, "இயக்கு") == 0) {
             fprintf(stderr, "[Parser] Starting Execution (இயக்கு)...\n");
 
-            // '}' வரும் வரை உள்ளே இருக்கும் எண்களைத் தேடுவோம்
             while (1) {
                 t = get_next_token(file);
-                if (t.type == 23 || t.type == T_EOF) break; // '}' வந்தால் நிறுத்து
+                if (t.type == 23 || t.type == T_EOF) break; 
 
-                // ஒரு டோக்கன் எண்ணாக இருக்கிறதா என்று அதன் முதல் எழுத்தை (0-9) வைத்துப் பார்ப்போம்
                 if (t.value[0] >= '0' && t.value[0] <= '9') {
                     int n1 = atoi(t.value);
                     fprintf(stderr, "[Parser] Found First Number: %d\n", n1);
 
-                    // அடுத்த எண் கிடைக்கும் வரை இடையில் இருப்பவற்றைத் தாண்டுவோம்
                     while (1) {
                         t = get_next_token(file);
                         if (t.type == 23 || t.type == T_EOF) break;
@@ -55,7 +73,6 @@ void parse(FILE *file) {
                         fprintf(stderr, "[Parser] Found Second Number: %d\n", n2);
                         fprintf(stderr, "[Parser] Logic Found: %d + %d\n", n1, n2);
                         
-                        // Backend-ஐ அழைத்து அவுட்புட் உருவாக்குதல்
                         tamizhi_gen_add_and_print(n1, n2);
                         break; 
                     }
@@ -65,7 +82,7 @@ void parse(FILE *file) {
     }
 }
 
-// 2. skip_block - இது பிளாக்குகளை சரியாக மூடும் வரை தாண்டும்
+// 2. skip_block - பிளாக்குகளைத் தாண்ட
 void skip_block(FILE *file) {
     Token t;
     int brace_count = 1;
@@ -74,4 +91,3 @@ void skip_block(FILE *file) {
         if (t.type == 23) brace_count--; // '}'
     }
 }
-
