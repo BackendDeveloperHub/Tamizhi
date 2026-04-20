@@ -9,7 +9,7 @@ T_Type get_keyword_type(char* value) {
     }
     // 2. நிகழ் / fun
     if (strcmp(value, "நிகழ்") == 0 || strcmp(value, "fun") == 0) {
-        return T_FUN;
+        return T_FUNC;
     }
     // 3. அச்சிடு / print
     if (strcmp(value, "அச்சிடு") == 0 || strcmp(value, "print") == 0) {
