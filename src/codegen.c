@@ -138,6 +138,7 @@ void tamizhi_codegen_finish() {
 #include <llvm-c/Core.h>
 #include <llvm-c/Analysis.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 LLVMModuleRef module;
 LLVMBuilderRef builder;
