@@ -15,5 +15,5 @@ void tamizhi_gen_loop_test(int limit);
 // --- புதிய பங்க்ஷன்கள்: வேரியபிளை பிரிண்ட் செய்ய மற்றும் கூட்டல் செய்ய ---
 void tamizhi_gen_print(char* var_name);         // இதோ இந்த வரிதான் மிஸ்ஸிங்!
 void tamizhi_gen_add_and_print(int n1, int n2); 
-
+void tamizhi_gen_var_add(char* res_name, char* var1, char* var2);
 #endif
