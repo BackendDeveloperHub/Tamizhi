@@ -8,13 +8,13 @@ T_Type get_keyword_type(char* value) {
     if (strcmp(value, "அச்சிடு") == 0) return T_PRINT;
     if (strcmp(value, "உள்ளீடு") == 0) return T_INP;
     if (strcmp(value, "சேர்") == 0) return T_IMP;
-    if (strcmp(value, "முழுஎண்") == 0) return T_INT;
-    if (strcmp(value, "மாலை") == 0) return T_STR;
-    if (strcmp(value, "என்றால்") == 0) return T_IF;
+    if (strcmp(value, "Num") == 0) return T_INT;
+    if (strcmp(value, "Str") == 0) return T_STR;
+    if (strcmp(value, "if") == 0) return T_IF;
     if (strcmp(value, "சு") == 0) return T_FOR;
     if (strcmp(value, "சு2") == 0) return T_WHILE;
-    if (strcmp(value, "திரும்பக்கொடு") == 0) return T_RET;
-    if (strcmp(value, "மெய்பொய்") == 0) return T_BOOL;
+    if (strcmp(value, "return") == 0) return T_RET;
+    if (strcmp(value, "bool") == 0) return T_BOOL;
     if (strcmp(value, "இயக்கு") == 0) return T_CALL;
     return T_ID; 
 }
