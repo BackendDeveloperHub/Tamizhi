@@ -12,8 +12,8 @@ void tamizhi_codegen_finish();
 void tamizhi_gen_var(char* name, int initial_value);
 void tamizhi_gen_loop_test(int limit);
 
-// --- புதிய பங்க்ஷன்: கூட்டல் மற்றும் பிரிண்ட் செய்ய ---
-// இந்த வரி இல்லை என்றால் 'parser.c' ஆல் இதைப் பயன்படுத்த முடியாது
+// --- புதிய பங்க்ஷன்கள்: வேரியபிளை பிரிண்ட் செய்ய மற்றும் கூட்டல் செய்ய ---
+void tamizhi_gen_print(char* var_name);         // இதோ இந்த வரிதான் மிஸ்ஸிங்!
 void tamizhi_gen_add_and_print(int n1, int n2); 
 
 #endif
