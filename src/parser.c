@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// 1. Prototype
+// 1. Prototype - அறிவிப்பு
 void skip_block(FILE *file); 
 
 void parse(FILE *file) {
@@ -36,15 +36,17 @@ void parse(FILE *file) {
             // '}' வரும் வரை உள்ளே இருக்கும் எண்களைத் தேடுவோம்
             while ((t = get_next_token(file)).type != 23 && t.type != T_EOF) {
                 
-                // 1. முதல் எண்ணைக் கண்டுபிடி (T_NUM)
-                if (t.type == T_NUM) {
-                    int n1 = atoi(t.value); 
+                // ஒரு டோக்கன் எண்ணாக இருக்கிறதா என்று அதன் முதல் எழுத்தை (0-9) வைத்துப் பார்ப்போம்
+                if (t.value[0] >= '0' && t.value[0] <= '9') {
+                    int n1 = atoi(t.value);
+                    fprintf(stderr, "[Parser] First Number Found: %d\n", n1);
 
-                    // 2. அடுத்த எண்ணைக் கண்டுபிடிக்கும் வரை இடையில் இருப்பவற்றை (add, +, () தாண்டுவோம்
-                    while ((t = get_next_token(file)).type != T_NUM && t.type != 23 && t.type != T_EOF);
+                    // அடுத்த எண் கிடைக்கும் வரை இடையில் இருப்பவற்றைத் தாண்டுவோம்
+                    while ((t = get_next_token(file)).type != T_EOF && (t.value[0] < '0' || t.value[0] > '9') && t.type != 23);
 
-                    if (t.type == T_NUM) {
+                    if (t.value[0] >= '0' && t.value[0] <= '9') {
                         int n2 = atoi(t.value);
+                        fprintf(stderr, "[Parser] Second Number Found: %d\n", n2);
                         fprintf(stderr, "[Parser] Logic Found: %d + %d\n", n1, n2);
                         
                         // Backend-ஐ அழைத்து அவுட்புட் உருவாக்குதல்
@@ -66,3 +68,4 @@ void skip_block(FILE *file) {
         if (t.type == 23) brace_count--; // '}'
     }
 }
+
