@@ -27,27 +27,28 @@ void parse(FILE *file) {
             if (t.type == 22) skip_block(file);
         }
 
-        // --- 'இயக்கு' ---
+        // --- 'இயக்கு' -//
         else if (t.type == T_CALL || strcmp(t.value, "இயக்கு") == 0) {
-            fprintf(stderr, "[Parser] Starting Execution (இயக்கு)...\n");
-
-            while ((t = get_next_token(file)).type != T_ID && t.type != 23 && t.type != T_EOF);
-
-            if (t.type == T_ID) {
-                while ((t = get_next_token(file)).type != T_NUM && t.type != 23 && t.type != T_EOF);
-
-                if (t.type == T_NUM) {
-                    int n1 = atoi(t.value); 
-                    get_next_token(file);   // '+' குறியீடு
-                    Token second = get_next_token(file); 
-                    int n2 = atoi(second.value);
-
-                    fprintf(stderr, "[Parser] Logic Found: %d + %d\n", n1, n2);
-                    tamizhi_gen_add_and_print(n1, n2);
-                }
+    fprintf(stderr, "[Parser] Starting Execution (இயக்கு)...\n");
+    
+    while ((t = get_next_token(file)).type != 23 && t.type != T_EOF) {
+        // ஒருவேளை இது நம்பராக இருந்தால்
+        if (t.type == T_NUM) {
+            int n1 = atoi(t.value); 
+            
+            get_next_token(file);   // '+' குறியீட்டைத் தாண்டுவோம்
+            
+            Token second = get_next_token(file); 
+            if (second.type == T_NUM) {
+                int n2 = atoi(second.value);
+                fprintf(stderr, "[Parser] Logic Found: %d + %d\n", n1, n2);
+                tamizhi_gen_add_and_print(n1, n2);
+                break; // ஒருமுறை கண்டுபிடிச்ச உடனே வெளிய வரலாம்
             }
         }
-    } // while லூப் இங்க முடியுது
+    }
+}
+// while லூப் இங்க முடியுது
 } // parse ஃபங்க்ஷன் இங்க முடியுது
 
 // 2. இப்போ தான் skip_block-ஐ தனியா வெளிய எழுதணும்
