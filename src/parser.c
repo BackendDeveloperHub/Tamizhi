@@ -171,7 +171,7 @@ void parse(FILE *file) {
             continue;
         }*/
                 // --- 'அச்சிடு' (Clean & Fixed Version) ---
-        else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
+       /* else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
             t = get_next_token(file);
             
             // 1. ஒருவேளை '(' இருந்தால் அதைத் தாண்டி அடுத்த டோக்கனை எடுப்போம்
@@ -187,7 +187,29 @@ void parse(FILE *file) {
             // லூப் தானாவே அடுத்த வரியைப் படிக்கட்டும்.
             continue;
         }
+         */
+                 // --- 'அச்சிடு' (Stable CLI Version) ---
+        else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
+            // அடுத்த டோக்கனை எடுப்போம் (இதுதான் மாறியின் பெயர்)
+            t = get_next_token(file);
             
+            // ஒருவேளை '(' இருந்தால் அதைத் தாண்டுவோம்
+            if (t.type == 15 || strcmp(t.value, "(") == 0) { 
+                t = get_next_token(file);
+            }
+            
+            fprintf(stderr, "[Parser] Printing Variable: %s\n", t.value);
+            tamizhi_gen_print(t.value);
+
+            // வரியின் இறுதியில் ';' அல்லது ')' இருந்தால் அதைத் தாண்டுவோம்
+            Token check = get_next_token(file);
+            if (!(check.type == 17 || check.type == 16)) {
+                // ';' இல்லையென்றால் அடுத்த லாஜிக்குக்கு டோக்கனைத் தயார் படுத்தும்
+                // இப்போதைக்கு இதை அப்படியே விடலாம்
+            }
+            continue;
+        }
+
 
         // --- 'சு' (Loop) ---
         else if (t.type == T_FOR || strcmp(t.value, "சு") == 0) {
