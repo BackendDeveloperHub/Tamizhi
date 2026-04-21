@@ -1,108 +1,3 @@
-/*#include "parser.h"
-#include "codegen.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-void skip_block(FILE *file); 
-
-void parse(FILE *file) {
-    Token t;
-    fprintf(stderr, "[Parser] Tamizhi Engine Analysis Started...\n");
-
-    while ((t = get_next_token(file)).type != T_EOF) {
-
-        // --- 'முதன்மை' (Main Block) ---
-        if (t.type == T_MAIN) {
-            fprintf(stderr, "[Parser] Main block detected.\n");
-            while ((t = get_next_token(file)).type != 22 && t.type != T_EOF); 
-            skip_block(file);
-            continue;
-        }
-
-        // --- 'நிகழ்' (Function Definition) ---
-        else if (t.type == T_FUNC) {
-            fprintf(stderr, "[Parser] Function definition detected.\n");
-            while ((t = get_next_token(file)).type != 17 && t.type != 22 && t.type != T_EOF);
-            if (t.type == 22) skip_block(file);
-            continue;
-        }
-
-        // --- 'முழுஎண்' (Variable Declaration: முழுஎண் அ = 10) ---
-        else if (t.type == T_INT || strcmp(t.value, "முழுஎண்") == 0) {
-            fprintf(stderr, "[Parser] Variable declaration detected...\n");
-            
-            // மாறியின் பெயரை எடுப்போம் (உதாரணம்: 'அ')
-            Token name_token = get_next_token(file); 
-            
-            // '=' வரும் வரை தாண்டுவோம்
-            while ((t = get_next_token(file)).type != 20 && t.type != T_EOF); 
-
-            // மதிப்பை எடுப்போம் (உதாரணம்: '10')
-            Token val_token = get_next_token(file);
-            
-            if (val_token.value[0] >= '0' && val_token.value[0] <= '9') {
-                int val = atoi(val_token.value);
-                // Codegen-க்கு அனுப்புவோம்
-                tamizhi_gen_var(name_token.value, val);
-            }
-            continue;
-        }
-
-        // --- 'அச்சிடு' (Print Variable: அச்சிடு அ) ---
-        else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
-            Token var_token = get_next_token(file);
-            fprintf(stderr, "[Parser] Print variable: %s\n", var_token.value);
-            tamizhi_gen_print(var_token.value);
-            continue;
-        }
-
-        // --- 'சு' (Loop) ---
-        else if (t.type == T_FOR || strcmp(t.value, "சு") == 0) {
-            fprintf(stderr, "[Parser] Loop detection started...\n");
-            while ((t = get_next_token(file)).type != T_NUM && t.type != T_EOF);
-            if (t.type == T_NUM) {
-                int limit = atoi(t.value);
-                tamizhi_gen_loop_test(limit);
-            }
-            while ((t = get_next_token(file)).type != 22 && t.type != T_EOF);
-            skip_block(file);
-            continue;
-        }
-
-        // --- 'இயக்கு' (Execution Block) ---
-        else if (t.type == T_CALL || strcmp(t.value, "இயக்கு") == 0) {
-            fprintf(stderr, "[Parser] Starting Execution (இயக்கு)...\n");
-            while (1) {
-                t = get_next_token(file);
-                if (t.type == 23 || t.type == T_EOF) break; 
-                if (t.value[0] >= '0' && t.value[0] <= '9') {
-                    int n1 = atoi(t.value);
-                    while (1) {
-                        t = get_next_token(file);
-                        if (t.type == 23 || t.type == T_EOF) break;
-                        if (t.value[0] >= '0' && t.value[0] <= '9') break;
-                    }
-                    if (t.value[0] >= '0' && t.value[0] <= '9') {
-                        int n2 = atoi(t.value);
-                        tamizhi_gen_add_and_print(n1, n2);
-                        break; 
-                    }
-                }
-            }
-        }
-    }
-}
-
-void skip_block(FILE *file) {
-    Token t;
-    int brace_count = 1;
-    while (brace_count > 0 && (t = get_next_token(file)).type != T_EOF) {
-        if (t.type == 22) brace_count++; 
-        if (t.type == 23) brace_count--; 
-    }
-}
-*/
 #include "parser.h"
 #include "codegen.h"
 #include <stdlib.h>
@@ -117,83 +12,36 @@ void parse(FILE *file) {
 
     while ((t = get_next_token(file)).type != T_EOF) {
 
-        // --- 'முதன்மை' (Main Block) ---
-        if (t.type == T_MAIN) {
-            fprintf(stderr, "[Parser] Main block detected.\n");
-            while ((t = get_next_token(file)).type != 22 && t.type != T_EOF); 
-            skip_block(file);
-            continue;
-        }
-
-        // --- 'நிகழ்' (Function Definition) ---
-        else if (t.type == T_FUNC) {
-            fprintf(stderr, "[Parser] Function definition detected.\n");
-            while ((t = get_next_token(file)).type != 17 && t.type != 22 && t.type != T_EOF);
-            if (t.type == 22) skip_block(file);
-            continue;
-        }
-
-        // --- 'முழுஎண்' (Variable Declaration: முழுஎண் அ = 10) ---
-        else if (t.type == T_INT || strcmp(t.value, "முழுஎண்") == 0) {
-            fprintf(stderr, "[Parser] Variable declaration detected...\n");
+        // 1. 'Num' அல்லது 'முழுஎண்' (Variable Declaration & Addition)
+        if (t.type == T_INT || strcmp(t.value, "Num") == 0 || strcmp(t.value, "முழுஎண்") == 0) {
+            Token name_token = get_next_token(file); // மாறியின் பெயர் (p, c, etc.)
             
-            Token name_token = get_next_token(file); 
-            
-            // '=' வரும் வரை தாண்டுவோம்
+            // '=' வரும் வரை தேடுவோம்
             while ((t = get_next_token(file)).type != 20 && t.type != T_EOF); 
 
-            Token val_token = get_next_token(file);
-            
-            if (val_token.value[0] >= '0' && val_token.value[0] <= '9') {
-                int val = atoi(val_token.value);
-                tamizhi_gen_var(name_token.value, val);
+            Token first_val = get_next_token(file); // முதல் மதிப்பு அல்லது மாறி
+
+            // --- கூட்டல் லாஜிக் செக் (Advanced) ---
+            Token op = get_next_token(file);
+            if (op.type == 19 || strcmp(op.value, "+") == 0) {
+                Token second_val = get_next_token(file);
+                // codegen-ல் நாம் உருவாக்கிய gen_var_add-ஐ கூப்பிடுவோம்
+                tamizhi_gen_var_add(name_token.value, first_val.value, second_val.value);
+            } else {
+                // சாதாரண அசைன்மென்ட் (Num p = 100)
+                if (isdigit(first_val.value[0])) {
+                    tamizhi_gen_var(name_token.value, atoi(first_val.value));
+                }
+                // 'op' டோக்கன் ஒருவேளை அடுத்த வரியோடதா இருக்கலாம், அதனால் அதை கவனிக்கணும்
+                // இப்போதைக்கு சிம்பிளா விட்டுடுவோம்
             }
             continue;
         }
 
-        // --- 'அச்சிடு' (Print Variable Fix) ---
-       /*else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
-            t = get_next_token(file);
-            
-            // ஒருவேளை '(' இருந்தால் அதைத் தாண்டுவோம்
-            if (t.type == 15 || strcmp(t.value, "(") == 0) { 
-                t = get_next_token(file);
-            }
-            
-            fprintf(stderr, "[Parser] Printing Variable: %s\n", t.value);
-            tamizhi_gen_print(t.value);
-
-            // ஒருவேளை ')' இருந்தால் அதையும் தாண்டுவோம் (Syntax தூய்மைக்காக)
-            Token next = get_next_token(file);
-            if (!(next.type == 16 || strcmp(next.value, ")") == 0)) {
-                //ungetc_token(next, file); // இது இல்லை என்றால் பரவாயில்லை, t-ஐ அப்படியே விடலாம்
-            }
-            continue;
-        }*/
-                // --- 'அச்சிடு' (Clean & Fixed Version) ---
-       /* else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
-            t = get_next_token(file);
-            
-            // 1. ஒருவேளை '(' இருந்தால் அதைத் தாண்டி அடுத்த டோக்கனை எடுப்போம்
-            if (t.type == 15 || strcmp(t.value, "(") == 0) { 
-                t = get_next_token(file); // இதுதான் உண்மையான மாறி (Variable)
-            }
-            
-            // 2. மாறியின் பெயரை அனுப்பி அச்சிடுவோம்
-            fprintf(stderr, "[Parser] Printing Variable: %s\n", t.value);
-            tamizhi_gen_print(t.value);
-
-            // 3. இங்க நாம வேற எந்த 'next' டோக்கனையும் தொட வேண்டாம். 
-            // லூப் தானாவே அடுத்த வரியைப் படிக்கட்டும்.
-            continue;
-        }
-         */
-                 // --- 'அச்சிடு' (Stable CLI Version) ---
+        // 2. 'அச்சிடு' (The Working Fix)
         else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
-            // அடுத்த டோக்கனை எடுப்போம் (இதுதான் மாறியின் பெயர்)
             t = get_next_token(file);
             
-            // ஒருவேளை '(' இருந்தால் அதைத் தாண்டுவோம்
             if (t.type == 15 || strcmp(t.value, "(") == 0) { 
                 t = get_next_token(file);
             }
@@ -201,49 +49,25 @@ void parse(FILE *file) {
             fprintf(stderr, "[Parser] Printing Variable: %s\n", t.value);
             tamizhi_gen_print(t.value);
 
-            // வரியின் இறுதியில் ';' அல்லது ')' இருந்தால் அதைத் தாண்டுவோம்
-            Token check = get_next_token(file);
-            if (!(check.type == 17 || check.type == 16)) {
-                // ';' இல்லையென்றால் அடுத்த லாஜிக்குக்கு டோக்கனைத் தயார் படுத்தும்
-                // இப்போதைக்கு இதை அப்படியே விடலாம்
-            }
+            // எக்ஸ்ட்ரா டோக்கன்களை எடுக்க வேண்டாம், அது அடுத்த வரியை பாதிக்கும்.
             continue;
         }
 
-
-        // --- 'சு' (Loop) ---
+        // 3. 'சு' (Loop)
         else if (t.type == T_FOR || strcmp(t.value, "சு") == 0) {
-            fprintf(stderr, "[Parser] Loop detection started...\n");
             while ((t = get_next_token(file)).type != T_NUM && t.type != T_EOF);
             if (t.type == T_NUM) {
-                int limit = atoi(t.value);
-                tamizhi_gen_loop_test(limit);
+                tamizhi_gen_loop_test(atoi(t.value));
             }
             while ((t = get_next_token(file)).type != 22 && t.type != T_EOF);
             skip_block(file);
             continue;
         }
 
-        // --- 'இயக்கு' (Execution Block) ---
-        else if (t.type == T_CALL || strcmp(t.value, "இயக்கு") == 0) {
-            fprintf(stderr, "[Parser] Starting Execution (இயக்கு)...\n");
-            while (1) {
-                t = get_next_token(file);
-                if (t.type == 23 || t.type == T_EOF) break; 
-                if (t.value[0] >= '0' && t.value[0] <= '9') {
-                    int n1 = atoi(t.value);
-                    while (1) {
-                        t = get_next_token(file);
-                        if (t.type == 23 || t.type == T_EOF) break;
-                        if (t.value[0] >= '0' && t.value[0] <= '9') break;
-                    }
-                    if (t.value[0] >= '0' && t.value[0] <= '9') {
-                        int n2 = atoi(t.value);
-                        tamizhi_gen_add_and_print(n1, n2);
-                        break; 
-                    }
-                }
-            }
+        // 4. 'முதன்மை' அல்லது மத்த பிளாக்குகளைத் தாண்டுதல்
+        else if (t.type == T_MAIN || t.type == T_FUNC || t.type == 22) {
+            skip_block(file);
+            continue;
         }
     }
 }
