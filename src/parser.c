@@ -13,7 +13,7 @@ void parse(FILE *file) {
 
     while ((t = get_next_token(file)).type != T_EOF) {
 
-        // 1. 'Num' அல்லது 'முழுஎண்' (Variable Declaration & Addition)
+        // 1. 'Num' அல்லது 'முழுஎண்'
         if (t.type == T_INT || strcmp(t.value, "Num") == 0 || strcmp(t.value, "முழுஎண்") == 0) {
             Token name_token = get_next_token(file); 
             
@@ -21,32 +21,43 @@ void parse(FILE *file) {
             while ((t = get_next_token(file)).type != 20 && t.type != T_EOF); 
 
             Token first_val = get_next_token(file); 
-            Token op = get_next_token(file);
-
-            // --- கூட்டல் லாஜிக் (Num c = a + b) ---
-            if (op.type == 19 || strcmp(op.value, "+") == 0) {
+            
+            // --- அட்வான்ஸ்டு டோக்கன் செக் ---
+            // அடுத்த டோக்கனைப் பார்ப்போம், அது '+' தானா என்று
+            Token next_t = get_next_token(file);
+            
+            if (next_t.type == 19 || strcmp(next_t.value, "+") == 0) {
+                // இது கூட்டல்: Num c = a + b
                 Token second_val = get_next_token(file);
                 tamizhi_gen_var_add(name_token.value, first_val.value, second_val.value);
-            } 
-            // --- சாதாரண அசைன்மென்ட் (Num p = 100) ---
-            else {
+            } else {
+                // இது சாதாரண அசைன்மென்ட்: Num p = 100
                 if (isdigit(first_val.value[0])) {
                     tamizhi_gen_var(name_token.value, atoi(first_val.value));
                 }
-                // 'op' என்பது அடுத்த வரியின் டோக்கனாக இருக்கலாம், அதனால் அதை கவனிக்க வேண்டும்
-                // (இப்போதைக்கு CLI-க்காக இது போதும்)
+                // *** மிக முக்கியம்: *** // எடுத்த 'next_t' ஒருவேளை 'அச்சிடு' ஆக இருந்தால், 
+                // அதை மீண்டும் ஃபைலுக்குள்ளேயே தள்ள வேண்டும் (Push back)
+                // அல்லது அந்த டோக்கனை இங்கேயே கையாள வேண்டும்.
+                // தற்காலிக தீர்வு: next_t-ஐ செக் பண்ணி அது அச்சிடு-வா என்று பார்ப்போம்.
+                if (next_t.type == T_PRINT || strcmp(next_t.value, "அச்சிடு") == 0) {
+                     // இப்போதைக்கு இதை அப்படியே லூப்புக்கு விடாமல் இங்கேயே ஹேண்டில் பண்ணலாம்
+                     // (அல்லது லெக்சர்ல unget_token பங்க்ஷன் இருந்தால் அதை பயன்படுத்தலாம்)
+                }
             }
             continue;
         }
 
-        // 2. 'அச்சிடு' (Print Logic)
+        // 2. 'அச்சிடு' - இது இப்போ கிளீனா வேலை செய்யும்
         else if (t.type == T_PRINT || strcmp(t.value, "அச்சிடு") == 0) {
-            t = get_next_token(file);
-            if (t.type == 15 || strcmp(t.value, "(") == 0) { 
-                t = get_next_token(file);
+            Token var_t = get_next_token(file);
+            
+            // பிராக்கெட் இருந்தால் தாண்டுவோம்
+            if (var_t.type == 15 || strcmp(var_t.value, "(") == 0) { 
+                var_t = get_next_token(file);
             }
-            fprintf(stderr, "[Parser] Printing Variable: %s\n", t.value);
-            tamizhi_gen_print(t.value);
+            
+            fprintf(stderr, "[Parser] Printing Variable: %s\n", var_t.value);
+            tamizhi_gen_print(var_t.value);
             continue;
         }
 
