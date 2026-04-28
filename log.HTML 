@@ -1,0 +1,164 @@
+from weasyprint import HTML
+
+# Content for the Tamizhi Development Log
+html_content = """
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            background-color: #f4f7f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-banner {
+            background-color: #1a2a6c;
+            color: white;
+            padding: 30pt 20pt;
+            text-align: center;
+            border-radius: 0 0 15pt 15pt;
+            margin-bottom: 30pt;
+        }
+        h1 {
+            margin: 0;
+            font-size: 26pt;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            font-size: 12pt;
+            opacity: 0.9;
+            margin-top: 5pt;
+        }
+        .section {
+            background: white;
+            padding: 15pt;
+            margin-bottom: 20pt;
+            border-left: 5px solid #b21f1f;
+            box-shadow: 0 2pt 5pt rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: #b21f1f;
+            font-size: 16pt;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5pt;
+        }
+        .date-badge {
+            display: inline-block;
+            background: #e1e8ed;
+            padding: 3pt 8pt;
+            border-radius: 4pt;
+            font-size: 9pt;
+            font-weight: bold;
+            margin-bottom: 10pt;
+        }
+        ul {
+            padding-left: 20pt;
+        }
+        li {
+            margin-bottom: 8pt;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #1a2a6c;
+        }
+        .footer {
+            margin-top: 40pt;
+            text-align: center;
+            font-size: 10pt;
+            color: #7f8c8d;
+            border-top: 1px solid #ddd;
+            padding-top: 10pt;
+        }
+        .status-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10pt;
+            border-radius: 5pt;
+            margin-top: 20pt;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <h1>தமிழி (Tamizhi) Development Log</h1>
+    <div class="subtitle">A high-performance LLVM-based Tamil Programming Language</div>
+    <div style="margin-top: 10pt;">Author: Prabakaran | Backend Developer Hub</div>
+</div>
+
+<div class="section">
+    <div class="date-badge">Phase 1: The Core Engine Setup</div>
+    <h2>கருவி உருவாக்கம்</h2>
+    <ul>
+        <li><span class="highlight">Compiler Base:</span> Tamizhi core was built using C and integrated with the <span class="highlight">LLVM Backend</span> for machine-level execution.</li>
+        <li><span class="highlight">Lexical Analysis:</span> Developed <code>lexer.c</code> to handle UTF-8 Tamil characters, ensuring smooth multi-byte tokenization.</li>
+        <li><span class="highlight">Codegen:</span> Established <code>codegen.c</code> to translate Tamizhi syntax into LLVM Intermediate Representation (IR).</li>
+    </ul>
+</div>
+
+<div class="section">
+    <div class="date-badge">Phase 2: Syntax Development (V0.1 Alpha)</div>
+    <h2>அடிப்படை சின்டாக்ஸ்</h2>
+    <ul>
+        <li>Implemented Variable Declaration using <span class="highlight">Num</span> (Integer type) and the Tamil keyword <span class="highlight">முழுஎண்</span>.</li>
+        <li>Added support for basic arithmetic operations, starting with Addition (+).</li>
+        <li>Created the <span class="highlight">அச்சிடு</span> (Print) command, mapped to LLVM printf calls for standard output.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <div class="date-badge">Phase 3: Stability & Optimization</div>
+    <h2>நிலைத்தன்மை மற்றும் வேகம்</h2>
+    <ul>
+        <li><span class="highlight">Delimiters:</span> Integrated Semicolon (;) logic into the parser to provide clear instruction boundaries.</li>
+        <li><span class="highlight">UTF-8 Fixes:</span> Resolved character splitting issues in the lexer using <code>unsigned char</code> handling.</li>
+        <li><span class="highlight">Performance Benchmarking:</span> Achieved sub-second execution for 1,000,000 operations, outperforming interpreted languages.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <div class="date-badge">Phase 4: Tooling & CLI (Present Status)</div>
+    <h2>பயனர் இடைமுகம் & CLI</h2>
+    <ul>
+        <li>Developed a <span class="highlight">Python CLI Wrapper</span> allowing users to run code via <code>tamizhi run script.tz</code>, automating the <code>make</code> and <code>clang</code> steps.</li>
+        <li>Defined the <span class="highlight">BDH (Backend Developer Hub)</span> Open Source strategy and the <span class="highlight">Developer Labs</span> commercial vision.</li>
+        <li>Planned the migration to a <span class="highlight">Native C CLI</span> for even higher performance and reduced dependencies.</li>
+    </ul>
+</div>
+
+<div class="status-box">
+    Current Status (April 27, 2026): Tamizhi is Stable & Functional.<br>
+    "தமிழி எழுந்து நிற்கிறது!"
+</div>
+
+<div class="section">
+    <h2>Roadmap (அடுத்த கட்டம்)</h2>
+    <ul>
+        <li>Implementation of <span class="highlight">Conditionals</span>: எனும் (if) and இல்லையெனில் (else).</li>
+        <li>Development of a <span class="highlight">Standard Library (StdLib)</span> for Math and String functions.</li>
+        <li>Creating a <span class="highlight">Python Library Bridge</span> to translate popular Python modules for Tamizhi users.</li>
+    </ul>
+</div>
+
+<div class="footer">
+    © 2026 Prabakaran | Backend Developer Hub (BDH) | Developer Labs
+</div>
+
+</body>
+</html>
+"""
+
+# Generate the PDF using WeasyPrint
+HTML(string=html_content).write_pdf("tamizhi_development_log_v1.pdf")
