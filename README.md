@@ -137,13 +137,11 @@ Tamizhi is an open-source project under the **Backend Developer Hub (BDH)** comm
 ---
 ## 📊 Benchmarks
 
-| Test | Result |
-|---|---|
-| Loop iterations (Android/Termux) | 130,000,000+ |
-| Runtime | ~43 seconds |
-| CPU usage | ~42% |
-| Backend | LLVM native |
-
+| 🔁 Loop Iterations | 1,000,000 |
+| ⏱️ Execution Time | 0.24s (output suppressed) |
+| ⚙️ CPU Usage | 64% |
+| 📱 Device | Android (Termux) — aarch64 |
+| 🔧 Backend | LLVM Native |
 ## 📜 License
 
 This project is licensed under the [MIT License](LICENSE).
