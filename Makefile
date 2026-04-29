@@ -1,4 +1,4 @@
-/*CC = gcc
+/* CC = gcc
 # LLVM config moolama flags-a edukkuroam
 LLVM_FLAGS = `llvm-config --cflags --ldflags --libs core`
 CFLAGS = -Iinclude -Wall
@@ -10,7 +10,8 @@ all:
 	$(CC) $(CFLAGS) $(SRC) $(LLVM_FLAGS) -o $(OBJ)
 
 clean:
-	rm -f $(OBJ)*/
+	rm -f $(OBJ)
+*/
 
 
 
