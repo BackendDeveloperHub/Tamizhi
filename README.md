@@ -2,69 +2,77 @@
 Native compiled
 
 
-​📜 Tamizhi (தமிழி) Programming Language
-​Tamizhi (தமிழி) என்பது தமிழ் மொழியை அடிப்படையாகக் கொண்ட ஒரு அதிவேக Native Compiled நிரலாக்க மொழி. இது நேரடியாக இயந்திர மொழியாக (Machine Code) மாற்றப்படுவதால், சி (C) மொழிக்கு இணையான அல்லது அதைவிடச் சிறந்த வேகத்தில் இயங்கும் வகையில் வடிவமைக்கப்பட்டுள்ளது.
-​🚀 நோக்கம் (Vision)
-​அதிவேகம்: சி (C) மொழியை விட வேகமான செயல்பாடு.
-​நேரடி அணுகல்: ஹார்டுவேர் மற்றும் மெமரியை நேரடியாகக் கையாளும் வசதி.
-​தாய்மொழி கல்வி: தமிழ் வழியில் உலகத்தரம் வாய்ந்த மென்பொருட்களை உருவாக்குதல்.
-​LLVM சக்தி: நவீன CPU-க்களின் வேகத்தை முழுமையாகப் பயன்படுத்த LLVM Backend-ஐப் பயன்படுத்துதல்.
+​🚀 தமிழி (Tamizhi) Programming Language
+தமிழி (Tamizhi) என்பது தமிழ் மொழியின் எளிமையையும், கம்ப்யூட்டரின் அதிவேகத்தையும் இணைக்கும் ஒரு நவீன Compiled Programming Language. இது வெறும் ஒரு Interpreter கிடையாது; இது நேரடியா மெஷின் கோடாக (Binary) மாறும் திறன் கொண்ட ஒரு அதிவேக மொழி.
+✨ சிறப்பம்சங்கள் (Features)
+LLVM Backend: நவீன கம்ப்யூட்டர்களுக்கு ஏற்ப கோடை ஆப்டிமைஸ் செய்து அதிவேக அவுட்புட் தரும்.
+Native CLI: C மொழியில் உருவாக்கப்பட்ட பிரத்யேக tamizhi கமாண்ட் லைன் டூல்.
+Performance: Python போன்ற மொழிகளை விட பல மடங்கு வேகம் (C-Speed).
+Tamil Syntax: தமிழிலேயே லாஜிக் எழுதும் வசதி (எ.கா: அச்சிடு, முழுஎண்).
+Linux Native: Linux (Arch/Manjaro) மற்றும் Android (Termux) சிஸ்டம்களில் சிறப்பாக இயங்கும்.
+🛠️ நிறுவும் முறை (Installation)
+முதலில் உங்கள் கணினியில் gcc, clang மற்றும் llvm இருப்பதை உறுதி செய்து கொள்ளவும்.
+
+
+புராஜெக்டை குளோன் செய்யவும்:
+
+git clone https://github.com/Prabakaran202/Tamizhi.git
+cd Tamizhi
 
 
 
-​🏗 ப்ராஜெக்ட் கட்டமைப்பு (Project Structure)
+கம்பைல் செய்ய (Build):
 
-Tamizhi/
-├── bin/                # கம்பைல் செய்யப்பட்ட இறுதி பைனரி கோப்புகள் (Compiler Executable)
-├── examples/           # .tz நீட்டிப்பு கொண்ட மாதிரி நிரல்கள் (Sample Programs)
-│   └── vanakkam.tz     # Hello World program
-├── include/            # C Header files (compiler-க்கு தேவையானவை)
-│   ├── lexer.h
-│   ├── parser.h
-│   └── codegen.h
-├── lib/                # Tamizhi-ன் அடிப்படை நூலகங்கள் (Standard Libraries)
-│   └── thirai.tz       # ஸ்கிரீன் அவுட்புட் செயல்பாடுகள்
-├── src/                # கம்பைலரின் சோர்ஸ் கோட் (C/C++ code)
-│   ├── main.c          # கம்பைலரின் நுழைவுப் புள்ளி
-│   ├── lexer.c         # சொற்களைப் பிரிக்கும் பகுதி (Tokenization)
-│   ├── parser.c        # இலக்கணத்தை ஆய்வு செய்யும் பகுதி
-│   └── codegen.c       # Binary/Machine code-ஐ உருவாக்கும் பகுதி
-├── tests/              # கம்பைலரைச் சோதிக்க தேவையான டெஸ்ட் கோப்புகள்
-├── Makefile            # ப்ராஜெக்ட்டை Compile செய்ய உதவும் ஆட்டோமேஷன் கோப்பு
-└── README.md           # தமிழி மொழியைப் பற்றிய விளக்கம்
-
-🛠 நிறுவும் முறை (Installation)
-​தற்போது இது உருவாக்கத்தில் (Development) உள்ளது. உங்கள் லினக்ஸ் கணினியில் கம்பைலரை உருவாக்க:
-
-git clone https://github.com/prabakaran202/tamizhi
-cd tamizhi
 make
 
-📝 மாதிரி நிரல் (Sample Code)
-​Tamizhi-யில் ஒரு எளிய நிரல் இப்படி அமையும்:
+சிஸ்டம் கமாண்டாக மாற்ற (Global Install):
 
-// 'அ' மற்றும் 'ஆ' ஆகிய எண்களைக் கூட்ட உதவும் நிரல்
-இணை "பதிவு.த"
-
-செயல் முதன்மை() {
-    எண் அ = 100;
-    எண் ஆ = 200;
-    எண் விடை = அ + ஆ;
-    
-    பதிவிடு("கூடுதல் மதிப்பு: ", விடை);
-}
-
-⚙️ எப்படி வேலை செய்கிறது? (How it Works)
-​சி (C) மொழியை விட வேகமாக இருக்க Tamizhi கீழ்க்கண்ட நவீன முறையைப் பின்பற்றுகிறது:
-​Lexical Analysis: தமிழ் குறியீடுகளை அடையாளங்களாக (Tokens) மாற்றும்.
-​Parsing: இலக்கண அமைப்பைச் சரிபார்த்து Abstract Syntax Tree (AST) உருவாக்கும்.
-​Intermediate Representation (IR): LLVM IR-ஆக மாற்றப்பட்டு பலகட்ட ஆப்ரிமைசேஷன் (Optimization) செய்யப்படும்.
-​Code Generation: CPU-க்கு ஏற்றவாறு மிகச்சிறந்த மெஷின் கோடாக (Binary) மாறும்.
+sudo cp tamizhi tamizhi_core /usr/local/bin/
 
 
+🚀 முதல் தமிழி கோட் (Your First Program)
+ஒரு புதிய கோப்பை உருவாக்கவும் (எ.கா: வணக்கம்.tz):
 
-​🤝 பங்களிப்பு (Contributing)
-​தமிழி மொழியை வளர்க்கவும், அதன் வேகத்தை மேம்படுத்தவும் நீங்கள் பங்களிக்க விரும்பினால், Pull Request-களை வரவேற்கிறோம்.
 
-​📄 உரிமம் (License)
-​இந்த ப்ராஜெக்ட் MIT License கீழ் வெளியிடப்பட்டுள்ளது.
+// தமிழி V0.1 Example
+Num அ = 100;
+Num ஆ = 200;
+Num இ = அ + ஆ;
+
+அச்சிடு இ;
+
+
+இயக்க (To Run):
+
+tamizhi run வணக்கம்.tz
+
+
+
+
+📂 கோப்பு அமைப்பு (Project Structure)
+src/: லெக்சர், பார்ஸர் மற்றும் கோட்-ஜென் (C source files).
+include/: ஹெடர் கோப்புகள்.
+examples/: தமிழி லாங்குவேஜ் சாம்பிள் கோட்கள்.
+tamizhi: பயனர் பயன்படுத்தும் CLI டூல்.
+tamizhi_core: தமிழியின் கம்பைலர் என்ஜின்.
+🗺️ வருங்காலத் திட்டம் (Roadmap)
+[x] LLVM Integration (Core Engine)
+[x] Native C CLI
+[ ] Conditionals (எனில் / இல்லையெனில் - if/else)
+[ ] Python Library Bridge (Translation)
+[ ] Tamizhi Package Manager (TPM)
+🤝 பங்களிக்க (Contributing)
+தமிழி ஒரு ஓப்பன் சோர்ஸ் புராஜெக்ட். இதன் வளர்ச்சிக்கு உதவ விரும்புபவர்கள் Pull Requests அனுப்பலாம் அல்லது பிழைகளை (Issues) சுட்டிக்காட்டலாம்.
+Community: Backend Developer Hub (BDH)
+📜 உரிமம் (License)
+இந்த புராஜெக்ட் MIT License-ன் கீழ் வெளியிடப்பட்டுள்ளது.
+Developed with ❤️ by Prabakaran தமிழுக்கும் அமுதென்று பேர், அந்தத் தமிழ் இன்பத் தமிழ் எங்கள் உயிருக்கு நேர்!
+
+
+
+
+
+
+
+
+
