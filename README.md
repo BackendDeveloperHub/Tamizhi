@@ -135,6 +135,14 @@ Tamizhi is an open-source project under the **Backend Developer Hub (BDH)** comm
 - ⭐ Like the project? Give it a star!
 
 ---
+## 📊 Benchmarks
+
+| Test | Result |
+|---|---|
+| Loop iterations (Android/Termux) | 130,000,000+ |
+| Runtime | ~43 seconds |
+| CPU usage | ~42% |
+| Backend | LLVM native |
 
 ## 📜 License
 
