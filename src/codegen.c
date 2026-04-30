@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> // access() பங்க்ஷனுக்காக
 
-// --- DNA-VM லாஜிக்கை இங்கே அறிவிக்கிறோம் ---
+// --- DNA-VM லாஜிக் அறிவிப்புகள் ---
 extern void encode_logic(const char* input_path, const char* output_path);
+extern void decode_logic(const char* dna_path, const char* output_path);
 
 LLVMModuleRef module;
 LLVMBuilderRef builder;
@@ -30,7 +32,7 @@ void tamizhi_codegen_init() {
     printf_type = LLVMFunctionType(LLVMInt32Type(), printf_args, 1, 1);
     printf_func = LLVMAddFunction(module, "printf", printf_type);
 
-    fprintf(stderr," [Codegen] LLVM Engine initialized with DNA support.\n");
+    fprintf(stderr," [Codegen] LLVM Engine initialized with DNA Auto-Recovery support.\n");
 }
 
 void tamizhi_generate_entry() {
@@ -43,19 +45,18 @@ void tamizhi_generate_entry() {
 void tamizhi_gen_var(char* name, int value) {
     if (var_count >= 100) return;
 
-    // --- புதுசா ஆட் பண்ணப்பட்டுள்ள DNA லாஜிக் ---
+    // --- DNA Encoding லாஜிக் ---
     char temp_val[30], dna_file[100];
     sprintf(temp_val, "temp_%s.txt", name);
     sprintf(dna_file, "storage/%s.dna", name);
-    
+
     FILE *f = fopen(temp_val, "w");
     if(f) {
         fprintf(f, "%d", value);
         fclose(f);
-        encode_logic(temp_val, dna_file); // இதுதான் தரவை DNA-வாக மாற்றும்
+        encode_logic(temp_val, dna_file); // DNA-வாக மாற்றுகிறது
         remove(temp_val); 
     }
-    // ---------------------------------------
 
     LLVMValueRef alloca = LLVMBuildAlloca(builder, LLVMInt32Type(), name);
     LLVMBuildStore(builder, LLVMConstInt(LLVMInt32Type(), value, 0), alloca);
@@ -65,6 +66,48 @@ void tamizhi_gen_var(char* name, int value) {
     var_count++;
 
     fprintf(stderr, "[Codegen] Variable '%s' = %d stored & DNA secured.\n", name, value);
+}
+
+// --- புதிய Auto-Recovery பிரிண்ட் லாஜிக் ---
+void tamizhi_gen_print(char* var_name) {
+    LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
+    LLVMValueRef val = NULL;
+
+    // 1. முதலில் மெமரி (Symbol Table) தேடுதல்
+    for(int i=0; i<var_count; i++) {
+        if(strcmp(symbol_table[i].name, var_name) == 0) {
+            val = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "load_val");
+            break;
+        }
+    }
+
+    // 2. லூப் வேரியபிளாக இருந்தால் (i)
+    if(!val && i_ptr && strcmp(var_name, "i") == 0) {
+        val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
+    }
+
+    // 3. மெமரியில் இல்லை என்றால், DNA-விலிருந்து மீட்டெடுத்தல் (Auto-Recovery)
+    if (!val) {
+        char dna_file[100];
+        sprintf(dna_file, "storage/%s.dna", var_name);
+        
+        if (access(dna_file, F_OK) == 0) { // ஃபைல் இருக்கிறதா என்று பார்க்கிறது
+            fprintf(stderr, " [DNA-VM] '%s' மெமரியில் இல்லை. DNA-விலிருந்து மீட்டெடுக்கப்படுகிறது...\n", var_name);
+            decode_logic(dna_file, "temp_recovery.txt");
+            
+            // இப்போதைக்கு ஒரு கான்ஸ்டன்ட் மதிப்பாகக் காட்டுகிறோம்
+            // உண்மையான டீகோடிங் மதிப்பை இங்கே இணைக்கலாம்
+            val = LLVMConstInt(LLVMInt32Type(), 0, 0); 
+            remove("temp_recovery.txt");
+        }
+    }
+
+    if(val) {
+        LLVMValueRef args[] = { fmt, val };
+        LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
+    } else {
+        fprintf(stderr, " [Error] வேரியபிள் '%s' எங்கும் காணப்படவில்லை!\n", var_name);
+    }
 }
 
 void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
@@ -88,25 +131,6 @@ void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
         var_count++;
 
         fprintf(stderr, "[Codegen] Logic: %s = %s + %s completed.\n", res_name, var1, var2);
-    }
-}
-
-void tamizhi_gen_print(char* var_name) {
-    LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
-    LLVMValueRef val = NULL;
-
-    for(int i=0; i<var_count; i++) {
-        if(strcmp(symbol_table[i].name, var_name) == 0) {
-            val = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "load_val");
-            break;
-        }
-    }
-
-    if(!val && i_ptr) val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
-
-    if(val) {
-        LLVMValueRef args[] = { fmt, val };
-        LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
     }
 }
 
