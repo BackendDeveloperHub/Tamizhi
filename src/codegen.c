@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> // access() மற்றும் getcwd() பங்க்ஷனுக்காக
+#include <unistd.h>
+#include <libgen.h> // dirname() பங்க்ஷனுக்காக
 
 // --- DNA-VM லாஜிக் அறிவிப்புகள் ---
 extern void encode_logic(const char* input_path, const char* output_path);
@@ -24,6 +25,19 @@ typedef struct {
 Variable symbol_table[100];
 int var_count = 0;
 
+// தமிழியின் மையக் களஞ்சியப் பாதையைக் கண்டுபிடிக்கும் பங்க்ஷன்
+void get_tamizhi_storage_path(char* var_name, char* output_path) {
+    char exe_path[1024];
+    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path)-1);
+    if (len != -1) {
+        exe_path[len] = '\0';
+        char* dir = dirname(exe_path); 
+        sprintf(output_path, "%s/storage/%s.dna", dir, var_name);
+    } else {
+        sprintf(output_path, "storage/%s.dna", var_name);
+    }
+}
+
 void tamizhi_codegen_init() {
     module = LLVMModuleCreateWithName("tamizhi_engine");
     builder = LLVMCreateBuilder();
@@ -32,7 +46,7 @@ void tamizhi_codegen_init() {
     printf_type = LLVMFunctionType(LLVMInt32Type(), printf_args, 1, 1);
     printf_func = LLVMAddFunction(module, "printf", printf_type);
 
-    fprintf(stderr," [Codegen] LLVM Engine initialized with DNA Universal Path support.\n");
+    fprintf(stderr," [Codegen] LLVM Engine initialized with Binary-Relative DNA Storage.\n");
 }
 
 void tamizhi_generate_entry() {
@@ -42,29 +56,22 @@ void tamizhi_generate_entry() {
     LLVMPositionBuilderAtEnd(builder, entry);
 }
 
-// --- Universal Path லாஜிக் கொண்ட வேரியபிள் உருவாக்கம் ---
 void tamizhi_gen_var(char* name, int value) {
     if (var_count >= 100) return;
 
-    char cwd[1024];
     char dna_file[2048];
     char temp_val[100];
     
-    // 1. தற்போதைய டைரக்டரியை தானாகவே கண்டுபிடித்தல்
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        sprintf(dna_file, "%s/storage/%s.dna", cwd, name);
-    } else {
-        sprintf(dna_file, "storage/%s.dna", name);
-    }
-    
+    // மையக் களஞ்சியப் பாதையைப் பெறுதல்
+    get_tamizhi_storage_path(name, dna_file);
     sprintf(temp_val, "temp_%s.txt", name);
 
-    // 2. DNA Encoding லாஜிக்
+    // DNA Encoding லாஜிக்
     FILE *f = fopen(temp_val, "w");
     if(f) {
         fprintf(f, "%d", value);
         fclose(f);
-        encode_logic(temp_val, dna_file); // Universal Path-ல் சேமிக்கும்
+        encode_logic(temp_val, dna_file); 
         remove(temp_val); 
     }
 
@@ -75,14 +82,12 @@ void tamizhi_gen_var(char* name, int value) {
     symbol_table[var_count].alloca_ptr = alloca;
     var_count++;
 
-    fprintf(stderr, " [Storage] Variable '%s' secured at: %s\n", name, dna_file);
+    fprintf(stderr, " [Storage] Variable '%s' secured at Tamizhi Core: %s\n", name, dna_file);
 }
 
-// --- Auto-Recovery பிரிண்ட் லாஜிக் ---
 void tamizhi_gen_print(char* var_name) {
     LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
     LLVMValueRef val = NULL;
-    char cwd[1024];
     char dna_file[2048];
 
     // 1. மெமரியில் தேடுதல்
@@ -98,16 +103,12 @@ void tamizhi_gen_print(char* var_name) {
         val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
     }
 
-    // 3. Universal Path-ல் DNA மீட்டெடுத்தல்
+    // 3. மையக் களஞ்சியத்திலிருந்து DNA மீட்டெடுத்தல் (Auto-Recovery)
     if (!val) {
-        if (getcwd(cwd, sizeof(cwd)) != NULL) {
-            sprintf(dna_file, "%s/storage/%s.dna", cwd, var_name);
-        } else {
-            sprintf(dna_file, "storage/%s.dna", var_name);
-        }
+        get_tamizhi_storage_path(var_name, dna_file);
 
         if (access(dna_file, F_OK) == 0) { 
-            fprintf(stderr, " [DNA-VM] '%s' மெமரியில் இல்லை. DNA-விலிருந்து மீட்டெடுக்கப்படுகிறது...\n", var_name);
+            fprintf(stderr, " [DNA-VM] '%s' மெமரியில் இல்லை. மையக் களஞ்சியத்திலிருந்து மீட்டெடுக்கப்படுகிறது...\n", var_name);
             decode_logic(dna_file, "temp_recovery.txt");
 
             FILE *res = fopen("temp_recovery.txt", "r");
@@ -175,7 +176,7 @@ void tamizhi_gen_loop_test(int limit) {
 
     LLVMValueRef next_val = LLVMBuildAdd(builder, i_val, LLVMConstInt(LLVMInt32Type(), 1, 0), "next_i");
     LLVMBuildStore(builder, next_val, i_ptr);
-    LLBuildBr(builder, cond_block);
+    LLVMBuildBr(builder, cond_block);
 
     LLVMPositionBuilderAtEnd(builder, after_block);
 }
