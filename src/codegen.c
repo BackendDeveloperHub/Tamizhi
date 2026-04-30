@@ -48,7 +48,8 @@ void tamizhi_gen_var(char* name, int value) {
     // --- DNA Encoding லாஜிக் ---
     char temp_val[30], dna_file[100];
     sprintf(temp_val, "temp_%s.txt", name);
-    sprintf(dna_file, "storage/%s.dna", name);
+    //sprintf(dna_file, "storage/%s.dna", name);
+    sprintf(dna_file, "dnapraba/Tamizhi/storage/%s.dna", name);
 
     FILE *f = fopen(temp_val, "w");
     if(f) {
