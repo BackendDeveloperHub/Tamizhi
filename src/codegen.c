@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <libgen.h> // dirname() பங்க்ஷனுக்காக
+
+// --- DNA-VM லாஜிக் அறிவிப்புகள் ---
+extern void encode_logic(const char* input_path, const char* output_path);
+extern void decode_logic(const char* dna_path, const char* output_path);
 
 [span_2](start_span)[span_3](start_span)// DNA-VM functions from core files[span_2](end_span)[span_3](end_span)
 extern void encode_logic(const char* input_path, const char* output_path);
@@ -74,13 +80,59 @@ void tamizhi_gen_var(char* name, int value) {
     symbol_table[var_count].alloca_ptr = alloca;
     var_count++;
 
-    fprintf(stderr, "[Codegen] Variable '%s' = %d (DNA Encoded).\n", name, value);
+    fprintf(stderr, " [Storage] Variable '%s' secured at Tamizhi Core: %s\n", name, dna_file);
+}
+
+void tamizhi_gen_print(char* var_name) {
+    LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
+    LLVMValueRef val = NULL;
+    char dna_file[2048];
+
+    // 1. மெமரியில் தேடுதல்
+    for(int i = 0; i < var_count; i++) {
+        if(strcmp(symbol_table[i].name, var_name) == 0) {
+            val = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "load_val");
+            break;
+        }
+    }
+
+    // 2. லூப் வேரியபிள் செக்
+    if(!val && i_ptr && strcmp(var_name, "i") == 0) {
+        val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
+    }
+
+    // 3. மையக் களஞ்சியத்திலிருந்து DNA மீட்டெடுத்தல் (Auto-Recovery)
+    if (!val) {
+        get_tamizhi_storage_path(var_name, dna_file);
+
+        if (access(dna_file, F_OK) == 0) { 
+            fprintf(stderr, " [DNA-VM] '%s' மெமரியில் இல்லை. மையக் களஞ்சியத்திலிருந்து மீட்டெடுக்கப்படுகிறது...\n", var_name);
+            decode_logic(dna_file, "temp_recovery.txt");
+
+            FILE *res = fopen("temp_recovery.txt", "r");
+            int recovered_val = 0;
+            if(res) {
+                if(fscanf(res, "%d", &recovered_val) == 1) {
+                    val = LLVMConstInt(LLVMInt32Type(), recovered_val, 0);
+                }
+                fclose(res);
+                remove("temp_recovery.txt"); 
+            }
+        }
+    }
+
+    if(val) {
+        LLVMValueRef args[] = { fmt, val };
+        LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
+    } else {
+        fprintf(stderr, " [Error] வேரியபிள் '%s' எங்கும் காணப்படவில்லை!\n", var_name);
+    }
 }
 
 void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
     LLVMValueRef v1_ptr = NULL, v2_ptr = NULL;
 
-    for(int i=0; i<var_count; i++) {
+    for(int i = 0; i < var_count; i++) {
         if(strcmp(symbol_table[i].name, var1) == 0) v1_ptr = symbol_table[i].alloca_ptr;
         if(strcmp(symbol_table[i].name, var2) == 0) v2_ptr = symbol_table[i].alloca_ptr;
     }
