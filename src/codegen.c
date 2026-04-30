@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// --- DNA-VM லாஜிக்கை இங்கே அறிவிக்கிறோம் ---
+extern void encode_logic(const char* input_path, const char* output_path);
+
 LLVMModuleRef module;
 LLVMBuilderRef builder;
 LLVMTypeRef printf_type;
@@ -27,7 +30,7 @@ void tamizhi_codegen_init() {
     printf_type = LLVMFunctionType(LLVMInt32Type(), printf_args, 1, 1);
     printf_func = LLVMAddFunction(module, "printf", printf_type);
 
-    fprintf(stderr," [Codegen] LLVM Engine initialized.\n");
+    fprintf(stderr," [Codegen] LLVM Engine initialized with DNA support.\n");
 }
 
 void tamizhi_generate_entry() {
@@ -39,14 +42,29 @@ void tamizhi_generate_entry() {
 
 void tamizhi_gen_var(char* name, int value) {
     if (var_count >= 100) return;
+
+    // --- புதுசா ஆட் பண்ணப்பட்டுள்ள DNA லாஜிக் ---
+    char temp_val[30], dna_file[100];
+    sprintf(temp_val, "temp_%s.txt", name);
+    sprintf(dna_file, "storage/%s.dna", name);
+    
+    FILE *f = fopen(temp_val, "w");
+    if(f) {
+        fprintf(f, "%d", value);
+        fclose(f);
+        encode_logic(temp_val, dna_file); // இதுதான் தரவை DNA-வாக மாற்றும்
+        remove(temp_val); 
+    }
+    // ---------------------------------------
+
     LLVMValueRef alloca = LLVMBuildAlloca(builder, LLVMInt32Type(), name);
     LLVMBuildStore(builder, LLVMConstInt(LLVMInt32Type(), value, 0), alloca);
-    
+
     strcpy(symbol_table[var_count].name, name);
     symbol_table[var_count].alloca_ptr = alloca;
     var_count++;
 
-    fprintf(stderr, "[Codegen] Variable '%s' = %d stored.\n", name, value);
+    fprintf(stderr, "[Codegen] Variable '%s' = %d stored & DNA secured.\n", name, value);
 }
 
 void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
@@ -68,7 +86,7 @@ void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
         strcpy(symbol_table[var_count].name, res_name);
         symbol_table[var_count].alloca_ptr = res_ptr;
         var_count++;
-        
+
         fprintf(stderr, "[Codegen] Logic: %s = %s + %s completed.\n", res_name, var1, var2);
     }
 }
@@ -85,7 +103,7 @@ void tamizhi_gen_print(char* var_name) {
     }
 
     if(!val && i_ptr) val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
-    
+
     if(val) {
         LLVMValueRef args[] = { fmt, val };
         LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
