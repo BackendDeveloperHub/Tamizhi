@@ -54,7 +54,7 @@ void tamizhi_gen_var(char* name, int value) {
     if(f) {
         fprintf(f, "%d", value);
         fclose(f);
-        encode_logic(temp_val, dna_file); // DNA-வாக மாற்றுகிறது
+        encode_logic(temp_val, dna_file); 
         remove(temp_val); 
     }
 
@@ -68,13 +68,13 @@ void tamizhi_gen_var(char* name, int value) {
     fprintf(stderr, "[Codegen] Variable '%s' = %d stored & DNA secured.\n", name, value);
 }
 
-// --- புதிய Auto-Recovery பிரிண்ட் லாஜிக் ---
+// --- புதிய Auto-Recovery பிரிண்ட் லாஜிக் (முழுமையாக மாற்றப்பட்டது) ---
 void tamizhi_gen_print(char* var_name) {
     LLVMValueRef fmt = LLVMBuildGlobalStringPtr(builder, "%d\n", "fmt");
     LLVMValueRef val = NULL;
 
-    // 1. முதலில் மெமரி (Symbol Table) தேடுதல்
-    for(int i=0; i<var_count; i++) {
+    // 1. முதலில் மெமரியில் (Symbol Table) தேடுதல்
+    for(int i = 0; i < var_count; i++) {
         if(strcmp(symbol_table[i].name, var_name) == 0) {
             val = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "load_val");
             break;
@@ -90,15 +90,23 @@ void tamizhi_gen_print(char* var_name) {
     if (!val) {
         char dna_file[100];
         sprintf(dna_file, "storage/%s.dna", var_name);
-        
-        if (access(dna_file, F_OK) == 0) { // ஃபைல் இருக்கிறதா என்று பார்க்கிறது
+
+        if (access(dna_file, F_OK) == 0) { 
             fprintf(stderr, " [DNA-VM] '%s' மெமரியில் இல்லை. DNA-விலிருந்து மீட்டெடுக்கப்படுகிறது...\n", var_name);
-            decode_logic(dna_file, "temp_recovery.txt");
             
-            // இப்போதைக்கு ஒரு கான்ஸ்டன்ட் மதிப்பாகக் காட்டுகிறோம்
-            // உண்மையான டீகோடிங் மதிப்பை இங்கே இணைக்கலாம்
-            val = LLVMConstInt(LLVMInt32Type(), 0, 0); 
-            remove("temp_recovery.txt");
+            // DNA-வை அசல் எண்ணாக மாற்றுகிறது
+            decode_logic(dna_file, "temp_recovery.txt");
+
+            // மீட்டெடுக்கப்பட்ட மதிப்பை ஃபைலிலிருந்து படிக்கிறது
+            FILE *res = fopen("temp_recovery.txt", "r");
+            int recovered_val = 0;
+            if(res) {
+                if(fscanf(res, "%d", &recovered_val) == 1) {
+                    val = LLVMConstInt(LLVMInt32Type(), recovered_val, 0);
+                }
+                fclose(res);
+                remove("temp_recovery.txt"); 
+            }
         }
     }
 
@@ -113,7 +121,7 @@ void tamizhi_gen_print(char* var_name) {
 void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
     LLVMValueRef v1_ptr = NULL, v2_ptr = NULL;
 
-    for(int i=0; i<var_count; i++) {
+    for(int i = 0; i < var_count; i++) {
         if(strcmp(symbol_table[i].name, var1) == 0) v1_ptr = symbol_table[i].alloca_ptr;
         if(strcmp(symbol_table[i].name, var2) == 0) v2_ptr = symbol_table[i].alloca_ptr;
     }
