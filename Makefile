@@ -1,24 +1,31 @@
-
+# கம்பைலர் மற்றும் ஃபிளாக்ஸ்
 CC = gcc
-# LLVM Flags-ஐ ஒரு வேரியபிளா வெச்சுக்கிட்டா பாக்குறதுக்கு கிளீனா இருக்கும்
-LLVM_FLAGS = `llvm-config --cflags --ldflags --libs core`
 CFLAGS = -Iinclude -Wall
+LLVM_FLAGS = `llvm-config --cflags --ldflags --libs --system-libs`
 
-# டிஃபால்ட்டா ரெண்டு ஃபைலையும் பில்ட் பண்ணும்
-all: tamizhi_core tamizhi
+# சோர்ஸ் கோப்புகள் (Source Files)
+SRCS = src/main.c src/lexer.c src/parser.c src/codegen.c core/encoder.c core/decoder.c
+CLI_SRC = src/tamizhi_cli.c
 
-# 1. தமிழி கோர் (The Compiler Backend)
-tamizhi_core: src/main.c src/lexer.c src/parser.c src/codegen.c
-	@echo "[Building] Tamizhi Core..."
-	@$(CC) $(CFLAGS) src/main.c src/lexer.c src/parser.c src/codegen.c $(LLVM_FLAGS) -o tamizhi_core
+# அவுட்புட் பைனரிகள்
+TARGET = tamizhi
 
-# 2. தமிழி CLI (The Frontend Tool)
-tamizhi: src/tamizhi_cli.c
-	@echo "[Building] Tamizhi CLI..."
-	@$(CC) src/tamizhi_cli.c -o tamizhi
+# டிஃபால்ட் கமெண்ட்: 'make' அடிச்சா இது ரன் ஆகும்
+all: setup $(TARGET)
 
-# பழைய பைனரி ஃபைல்களை நீக்க
+# 1. தேவையான ஃபோல்டர்களை உருவாக்குதல்
+setup:
+	@mkdir -p storage
+	@echo "[System] Storage folder initialized."
+
+# 2. தமிழி மெயின் இன்ஜினை பில்ட் செய்தல்
+$(TARGET): $(SRCS)
+	@echo "[Building] Tamizhi Engine with DNA-VM Support..."
+	@$(CC) $(CFLAGS) $(SRCS) $(LLVM_FLAGS) -o $(TARGET)
+	@echo "[Success] Tamizhi is ready to use!"
+
+# பழைய ஃபைல்களை நீக்க
 clean:
-	@echo "[Cleaning] Removing binaries..."
-	@rm -f tamizhi_core tamizhi
-
+	@echo "[Cleaning] Removing binaries and temporary files..."
+	@rm -f $(TARGET)
+	@rm -rf storage/*.dna
