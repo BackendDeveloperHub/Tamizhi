@@ -152,12 +152,11 @@ void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
 void tamizhi_gen_if_start(char* var1, char* op, char* var2) {
     LLVMValueRef v1 = NULL, v2 = NULL;
 
-    // 1. வேரியபிளை லோடு செய்தல்
     for(int i = 0; i < var_count; i++) {
         if(strcmp(symbol_table[i].name, var1) == 0) 
             v1 = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "v1");
     }
-    
+
     if(isdigit(var2[0])) {
         v2 = LLVMConstInt(LLVMInt32Type(), atoi(var2), 0);
     } else {
@@ -169,14 +168,12 @@ void tamizhi_gen_if_start(char* var1, char* op, char* var2) {
 
     if(!v1 || !v2) return;
 
-    // 2. கம்பேரிசன்
     LLVMIntPredicate pred = LLVMIntEQ; 
     if(strcmp(op, "<") == 0) pred = LLVMIntSLT;
     if(strcmp(op, ">") == 0) pred = LLVMIntSGT;
 
     LLVMValueRef cond = LLVMBuildICmp(builder, pred, v1, v2, "if_cond");
 
-    // 3. பிரான்ச்சிங் பிளாக்குகள்
     LLVMValueRef func = LLVMGetBasicBlockParent(LLVMGetInsertBlock(builder));
     then_block = LLVMAppendBasicBlock(func, "then");
     else_block = LLVMAppendBasicBlock(func, "else");
@@ -187,12 +184,19 @@ void tamizhi_gen_if_start(char* var1, char* op, char* var2) {
 }
 
 void tamizhi_gen_else_start() {
-    LLVMBuildBr(builder, merge_block);
+    if (LLVMGetBasicBlockTerminator(LLVMGetInsertBlock(builder)) == NULL) {
+        LLVMBuildBr(builder, merge_block);
+    }
     LLVMPositionBuilderAtEnd(builder, else_block);
 }
 
 void tamizhi_gen_if_end() {
-    LLVMBuildBr(builder, merge_block);
+    // 1. தற்போதைய பிளாக்கில் இருந்து மெர்ஜ் பிளாக்குக்கு ஒரு கட்டாய ஜம்ப்
+    if (LLVMGetBasicBlockTerminator(LLVMGetInsertBlock(builder)) == NULL) {
+        LLVMBuildBr(builder, merge_block);
+    }
+    
+    // 2. பில்டரை மெர்ஜ் பிளாக்கிற்கு நகர்த்து
     LLVMPositionBuilderAtEnd(builder, merge_block);
 }
 
@@ -200,7 +204,6 @@ void tamizhi_gen_if_end() {
 
 void tamizhi_gen_loop_start(int limit) {
     fprintf(stderr, " [Codegen] Loop Support Enabled for: %d cycles\n", limit);
-    // Future: LLVM Loop branch logic can be added here
 }
 
 void tamizhi_gen_loop_end() {
