@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+[span_2](start_span)[span_3](start_span)// DNA-VM functions from core files[span_2](end_span)[span_3](end_span)
+extern void encode_logic(const char* input_path, const char* output_path);
+extern void decode_logic(const char* dna_path, const char* output_path);
+
 LLVMModuleRef module;
 LLVMBuilderRef builder;
 LLVMTypeRef printf_type;
@@ -19,6 +23,25 @@ typedef struct {
 Variable symbol_table[100];
 int var_count = 0;
 
+[span_4](start_span)// வேரியபிளை DNA-வாக மாற்றி ஸ்டோரேஜில் சேமிக்கும் பங்க்ஷன்[span_4](end_span)
+void tamizhi_dna_secure_storage(char* name, int value) {
+    char temp_raw[60], dna_file[100];
+    sprintf(temp_raw, "temp_%s.txt", name);
+    sprintf(dna_file, "storage/%s.dna", name);
+
+    // தற்காலிகமாக எண்ணை ஒரு கோப்பில் எழுதுகிறோம்
+    FILE *f = fopen(temp_raw, "w");
+    if (f) {
+        fprintf(f, "%d", value);
+        fclose(f);
+        
+        [span_5](start_span)// DNA-வாக என்கோட் செய்கிறோம்[span_5](end_span)
+        encode_logic(temp_raw, dna_file);
+        remove(temp_raw); // தற்காலிக கோப்பை நீக்குகிறோம்
+        fprintf(stderr, " [DNA-VM] '%s' தரவு பாதுகாப்பாகச் சேமிக்கப்பட்டது.\n", name);
+    }
+}
+
 void tamizhi_codegen_init() {
     module = LLVMModuleCreateWithName("tamizhi_engine");
     builder = LLVMCreateBuilder();
@@ -27,7 +50,7 @@ void tamizhi_codegen_init() {
     printf_type = LLVMFunctionType(LLVMInt32Type(), printf_args, 1, 1);
     printf_func = LLVMAddFunction(module, "printf", printf_type);
 
-    fprintf(stderr," [Codegen] LLVM Engine initialized.\n");
+    fprintf(stderr," [Codegen] LLVM + DNA Engine initialized.\n");
 }
 
 void tamizhi_generate_entry() {
@@ -39,14 +62,19 @@ void tamizhi_generate_entry() {
 
 void tamizhi_gen_var(char* name, int value) {
     if (var_count >= 100) return;
+    
+    [span_6](start_span)// 1. தரவை DNA-வாக மாற்றி சேமித்தல்[span_6](end_span)
+    tamizhi_dna_secure_storage(name, value);
+
+    [span_7](start_span)// 2. LLVM மெமரி அலோகேஷன்[span_7](end_span)
     LLVMValueRef alloca = LLVMBuildAlloca(builder, LLVMInt32Type(), name);
     LLVMBuildStore(builder, LLVMConstInt(LLVMInt32Type(), value, 0), alloca);
-    
+
     strcpy(symbol_table[var_count].name, name);
     symbol_table[var_count].alloca_ptr = alloca;
     var_count++;
 
-    fprintf(stderr, "[Codegen] Variable '%s' = %d stored.\n", name, value);
+    fprintf(stderr, "[Codegen] Variable '%s' = %d (DNA Encoded).\n", name, value);
 }
 
 void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
@@ -65,11 +93,12 @@ void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
         LLVMValueRef res_ptr = LLVMBuildAlloca(builder, LLVMInt32Type(), res_name);
         LLVMBuildStore(builder, sum, res_ptr);
 
+        // கூட்டல் முடிவை டிஎன்ஏ-வாகச் சேமிக்க இப்போதைக்கு ஒரு மாக் வேல்யூ (உதாரணத்திற்கு 0)
+        tamizhi_dna_secure_storage(res_name, 0); 
+
         strcpy(symbol_table[var_count].name, res_name);
         symbol_table[var_count].alloca_ptr = res_ptr;
         var_count++;
-        
-        fprintf(stderr, "[Codegen] Logic: %s = %s + %s completed.\n", res_name, var1, var2);
     }
 }
 
@@ -85,7 +114,7 @@ void tamizhi_gen_print(char* var_name) {
     }
 
     if(!val && i_ptr) val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
-    
+
     if(val) {
         LLVMValueRef args[] = { fmt, val };
         LLVMBuildCall2(builder, printf_type, printf_func, args, 2, "print_call");
