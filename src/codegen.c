@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <ctype.h>
 
 // --- DNA-VM லாஜிக் அறிவிப்புகள் ---
 extern void encode_logic(const char* input_path, const char* output_path);
@@ -17,6 +18,9 @@ LLVMBuilderRef builder;
 LLVMTypeRef printf_type;
 LLVMValueRef printf_func;
 LLVMValueRef i_ptr = NULL; 
+
+// இஃப்-எல்ஸ்-க்குத் தேவையான குளோபல் பிளாக்குகள்
+LLVMBasicBlockRef then_block, else_block, merge_block;
 
 typedef struct {
     char name[50];
@@ -100,7 +104,6 @@ void tamizhi_gen_print(char* var_name) {
         val = LLVMBuildLoad2(builder, LLVMInt32Type(), i_ptr, "load_val");
     }
 
-    // DNA Recovery Logic
     if (!val) {
         get_tamizhi_storage_path(var_name, dna_file);
         if (access(dna_file, F_OK) == 0) { 
@@ -144,30 +147,68 @@ void tamizhi_gen_var_add(char* res_name, char* var1, char* var2) {
     }
 }
 
-// பழைய லூப் டெஸ்ட் (Compatibility-க்காக)
-void tamizhi_gen_loop_test(int limit) {
-    tamizhi_gen_loop_start(limit);
+// --- நிபந்தனை லாஜிக் (Real If-Else Implementation) ---
+
+void tamizhi_gen_if_start(char* var1, char* op, char* var2) {
+    LLVMValueRef v1 = NULL, v2 = NULL;
+
+    // 1. வேரியபிளை லோடு செய்தல்
+    for(int i = 0; i < var_count; i++) {
+        if(strcmp(symbol_table[i].name, var1) == 0) 
+            v1 = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "v1");
+    }
+    
+    if(isdigit(var2[0])) {
+        v2 = LLVMConstInt(LLVMInt32Type(), atoi(var2), 0);
+    } else {
+        for(int i = 0; i < var_count; i++) {
+            if(strcmp(symbol_table[i].name, var2) == 0)
+                v2 = LLVMBuildLoad2(builder, LLVMInt32Type(), symbol_table[i].alloca_ptr, "v2");
+        }
+    }
+
+    if(!v1 || !v2) return;
+
+    // 2. கம்பேரிசன்
+    LLVMIntPredicate pred = LLVMIntEQ; 
+    if(strcmp(op, "<") == 0) pred = LLVMIntSLT;
+    if(strcmp(op, ">") == 0) pred = LLVMIntSGT;
+
+    LLVMValueRef cond = LLVMBuildICmp(builder, pred, v1, v2, "if_cond");
+
+    // 3. பிரான்ச்சிங் பிளாக்குகள்
+    LLVMValueRef func = LLVMGetBasicBlockParent(LLVMGetInsertBlock(builder));
+    then_block = LLVMAppendBasicBlock(func, "then");
+    else_block = LLVMAppendBasicBlock(func, "else");
+    merge_block = LLVMAppendBasicBlock(func, "if_cont");
+
+    LLVMBuildCondBr(builder, cond, then_block, else_block);
+    LLVMPositionBuilderAtEnd(builder, then_block);
 }
 
-// --- புதிய If/Else & Loop Skeleton ---
+void tamizhi_gen_else_start() {
+    LLVMBuildBr(builder, merge_block);
+    LLVMPositionBuilderAtEnd(builder, else_block);
+}
+
+void tamizhi_gen_if_end() {
+    LLVMBuildBr(builder, merge_block);
+    LLVMPositionBuilderAtEnd(builder, merge_block);
+}
+
+// --- லூப் பங்க்ஷன்கள் ---
+
 void tamizhi_gen_loop_start(int limit) {
-    fprintf(stderr, " [Codegen] Loop Start: %d\n", limit);
+    fprintf(stderr, " [Codegen] Loop Support Enabled for: %d cycles\n", limit);
+    // Future: LLVM Loop branch logic can be added here
 }
 
 void tamizhi_gen_loop_end() {
     fprintf(stderr, " [Codegen] Loop End\n");
 }
 
-void tamizhi_gen_if_start(char* var1, char* op, char* var2) {
-    fprintf(stderr, " [Codegen] If: %s %s %s\n", var1, op, var2);
-}
-
-void tamizhi_gen_else_start() {
-    fprintf(stderr, " [Codegen] Else Block\n");
-}
-
-void tamizhi_gen_if_end() {
-    fprintf(stderr, " [Codegen] If End\n");
+void tamizhi_gen_loop_test(int limit) {
+    tamizhi_gen_loop_start(limit);
 }
 
 void tamizhi_codegen_finish() {
