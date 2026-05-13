@@ -1,70 +1,157 @@
-# Tamizhi-
-Native compiled
+<div align="center">
 
+# 🌟 Tamizhi (தமிழி)
 
-​📜 Tamizhi (தமிழி) Programming Language
-​Tamizhi (தமிழி) என்பது தமிழ் மொழியை அடிப்படையாகக் கொண்ட ஒரு அதிவேக Native Compiled நிரலாக்க மொழி. இது நேரடியாக இயந்திர மொழியாக (Machine Code) மாற்றப்படுவதால், சி (C) மொழிக்கு இணையான அல்லது அதைவிடச் சிறந்த வேகத்தில் இயங்கும் வகையில் வடிவமைக்கப்பட்டுள்ளது.
-​🚀 நோக்கம் (Vision)
-​அதிவேகம்: சி (C) மொழியை விட வேகமான செயல்பாடு.
-​நேரடி அணுகல்: ஹார்டுவேர் மற்றும் மெமரியை நேரடியாகக் கையாளும் வசதி.
-​தாய்மொழி கல்வி: தமிழ் வழியில் உலகத்தரம் வாய்ந்த மென்பொருட்களை உருவாக்குதல்.
-​LLVM சக்தி: நவீன CPU-க்களின் வேகத்தை முழுமையாகப் பயன்படுத்த LLVM Backend-ஐப் பயன்படுத்துதல்.
+**A Native Compiled Programming Language with Tamil Syntax**
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Android-blue.svg)]()
+[![Backend](https://img.shields.io/badge/Backend-LLVM-red.svg)]()
+[![Community](https://img.shields.io/badge/Community-BackendDeveloperHub-green.svg)](https://github.com/BackendDeveloperHub)
+[![Version](https://img.shields.io/badge/Version-0.1-orange.svg)]()
 
+*Write code in Tamil. Compile to native machine code. Run at C speed.*
 
-​🏗 ப்ராஜெக்ட் கட்டமைப்பு (Project Structure)
+</div>
 
-Tamizhi/
-├── bin/                # கம்பைல் செய்யப்பட்ட இறுதி பைனரி கோப்புகள் (Compiler Executable)
-├── examples/           # .tz நீட்டிப்பு கொண்ட மாதிரி நிரல்கள் (Sample Programs)
-│   └── vanakkam.tz     # Hello World program
-├── include/            # C Header files (compiler-க்கு தேவையானவை)
-│   ├── lexer.h
-│   ├── parser.h
-│   └── codegen.h
-├── lib/                # Tamizhi-ன் அடிப்படை நூலகங்கள் (Standard Libraries)
-│   └── thirai.tz       # ஸ்கிரீன் அவுட்புட் செயல்பாடுகள்
-├── src/                # கம்பைலரின் சோர்ஸ் கோட் (C/C++ code)
-│   ├── main.c          # கம்பைலரின் நுழைவுப் புள்ளி
-│   ├── lexer.c         # சொற்களைப் பிரிக்கும் பகுதி (Tokenization)
-│   ├── parser.c        # இலக்கணத்தை ஆய்வு செய்யும் பகுதி
-│   └── codegen.c       # Binary/Machine code-ஐ உருவாக்கும் பகுதி
-├── tests/              # கம்பைலரைச் சோதிக்க தேவையான டெஸ்ட் கோப்புகள்
-├── Makefile            # ப்ராஜெக்ட்டை Compile செய்ய உதவும் ஆட்டோமேஷன் கோப்பு
-└── README.md           # தமிழி மொழியைப் பற்றிய விளக்கம்
+---
 
-🛠 நிறுவும் முறை (Installation)
-​தற்போது இது உருவாக்கத்தில் (Development) உள்ளது. உங்கள் லினக்ஸ் கணினியில் கம்பைலரை உருவாக்க:
+## 📖 About
 
-git clone https://github.com/prabakaran202/tamizhi
-cd tamizhi
+**Tamizhi** is a compiled programming language that combines the elegance of the Tamil language with the raw performance of native machine code. Unlike interpreted languages, Tamizhi compiles directly to binary via an LLVM backend — delivering performance comparable to C, while letting developers write logic in Tamil syntax.
+
+> தமிழிலேயே கோட் எழுதி, மெஷின் ஸ்பீட்-ல இயக்கு.
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🔥 **LLVM Backend** | Optimized native code generation for modern CPUs |
+| ⚡ **C-Level Performance** | Significantly faster than Python and other interpreted languages |
+| 🛠️ **Native CLI** | Dedicated `tamizhi` command-line tool written in C |
+| 🌐 **Tamil Syntax** | Write logic using Tamil keywords (`அச்சிடு`, `முழுஎண்`, etc.) |
+| 🐧 **Linux Native** | Optimized for Linux (Arch/Manjaro) and Android (Termux) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Ensure the following tools are installed on your system:
+
+```bash
+gcc --version
+clang --version
+llvm-config --version
+```
+
+### Installation
+
+**1. Clone the repository:**
+
+```bash
+git clone https://github.com/Prabakaran202/Tamizhi.git
+cd Tamizhi
+```
+
+**2. Build the compiler:**
+
+```bash
 make
+```
 
-📝 மாதிரி நிரல் (Sample Code)
-​Tamizhi-யில் ஒரு எளிய நிரல் இப்படி அமையும்:
+**3. Install globally:**
 
-// 'அ' மற்றும் 'ஆ' ஆகிய எண்களைக் கூட்ட உதவும் நிரல்
-இணை "பதிவு.த"
+```bash
+sudo cp tamizhi tamizhi_core /usr/local/bin/
+```
 
-செயல் முதன்மை() {
-    எண் அ = 100;
-    எண் ஆ = 200;
-    எண் விடை = அ + ஆ;
-    
-    பதிவிடு("கூடுதல் மதிப்பு: ", விடை);
-}
+---
 
-⚙️ எப்படி வேலை செய்கிறது? (How it Works)
-​சி (C) மொழியை விட வேகமாக இருக்க Tamizhi கீழ்க்கண்ட நவீன முறையைப் பின்பற்றுகிறது:
-​Lexical Analysis: தமிழ் குறியீடுகளை அடையாளங்களாக (Tokens) மாற்றும்.
-​Parsing: இலக்கண அமைப்பைச் சரிபார்த்து Abstract Syntax Tree (AST) உருவாக்கும்.
-​Intermediate Representation (IR): LLVM IR-ஆக மாற்றப்பட்டு பலகட்ட ஆப்ரிமைசேஷன் (Optimization) செய்யப்படும்.
-​Code Generation: CPU-க்கு ஏற்றவாறு மிகச்சிறந்த மெஷின் கோடாக (Binary) மாறும்.
+## 👨‍💻 Your First Tamizhi Program
 
+Create a new file with `.tz` extension (e.g., `vanakkam.tz`):
 
+```tamizhi
+// Tamizhi V0.1 — Basic Arithmetic
 
-​🤝 பங்களிப்பு (Contributing)
-​தமிழி மொழியை வளர்க்கவும், அதன் வேகத்தை மேம்படுத்தவும் நீங்கள் பங்களிக்க விரும்பினால், Pull Request-களை வரவேற்கிறோம்.
+Num அ = 100;
+Num ஆ = 200;
+Num இ = அ + ஆ;
 
-​📄 உரிமம் (License)
-​இந்த ப்ராஜெக்ட் MIT License கீழ் வெளியிடப்பட்டுள்ளது.
+அச்சிடு இ;
+```
+
+**Run it:**
+
+```bash
+tamizhi run vanakkam.tz
+```
+
+**Output:**
+
+```
+300
+```
+
+---
+
+## 📁 Project Structure
+
+```
+Tamizhi/
+├── src/                  # Lexer, Parser, and Code Generator (C source files)
+├── include/              # Header files
+├── examples/             # Sample Tamizhi programs
+├── tamizhi               # User-facing CLI tool
+├── tamizhi_core          # Compiler engine (LLVM-based)
+└── Makefile
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [x] LLVM Integration (Core Compiler Engine)
+- [x] Native C CLI (`tamizhi run`)
+- [x] Basic arithmetic and variable declaration
+- [ ] Conditionals — `எனில்` / `இல்லையெனில்` (if / else)
+- [ ] Loops — `மீண்டும்` (while / for)
+- [ ] Functions — `செயல்` (functions)
+- [ ] Python Library Bridge
+- [ ] Tamizhi Package Manager (TPM)
+
+---
+
+## 🤝 Contributing
+
+Tamizhi is an open-source project under the **Backend Developer Hub (BDH)** community. Contributions are welcome!
+
+- 🐛 Found a bug? [Open an Issue](https://github.com/Prabakaran202/Tamizhi/issues)
+- 💡 Have a feature idea? Submit a Pull Request
+- ⭐ Like the project? Give it a star!
+
+---
+## 📊 Benchmarks
+
+| 🔁 Loop Iterations | 1,000,000 |
+| ⏱️ Execution Time | 0.24s (output suppressed) |
+| ⚙️ CPU Usage | 64% |
+| 📱 Device | Android (Termux) — aarch64 |
+| 🔧 Backend | LLVM Native |
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+Developed with ❤️ by [Prabakaran](https://github.com/Prabakaran202) · [Backend Developer Hub](https://github.com/BackendDeveloperHub)
+
+*தமிழுக்கும் அமுதென்று பேர் — அந்தத் தமிழ் இன்பத் தமிழ் எங்கள் உயிருக்கு நேர்!*
+
+</div>

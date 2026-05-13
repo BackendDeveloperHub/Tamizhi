@@ -3,26 +3,38 @@
 #include <ctype.h>
 
 T_Type get_keyword_type(char* value) {
-    if (strcmp(value, "முதன்மை") ==0) return T_MAIN;
-    if (strcmp(value, "நிகழ்") == 0) return T_FUNC;
-    if (strcmp(value, "அச்சிடு") == 0) return T_PRINT;
-    if (strcmp(value, "உள்ளீடு") == 0) return T_INP;
-    if (strcmp(value, "சேர்") == 0) return T_IMP;
-    if (strcmp(value, "முழுஎண்") == 0) return T_INT;
-    if (strcmp(value, "மாலை") == 0) return T_STR;
-    if (strcmp(value, "என்றால்") == 0) return T_IF;
-    if (strcmp(value, "சு") == 0) return T_FOR;
-    if (strcmp(value, "சு2") == 0) return T_WHILE;
-    if (strcmp(value, "திரும்பக்கொடு") == 0) return T_RET;
-    if (strcmp(value, "மெய்பொய்") == 0) return T_BOOL;
-    if (strcmp(value, "இயக்கு") == 0) return T_CALL;
+    // 1. அமைப்பு / Structure
+    if (strcmp(value, "முதன்மை") == 0 || strcmp(value, "main") == 0) return T_MAIN;
+    if (strcmp(value, "நிகழ்") == 0 || strcmp(value, "fun") == 0) return T_FUNC;
+    if (strcmp(value, "பூட்டர்") == 0 || strcmp(value, "footer") == 0) return T_FOOTER;
+
+    // 2. வெளியீடு & உள்ளீடு / I/O
+    if (strcmp(value, "அச்சிடு") == 0 || strcmp(value, "print") == 0) return T_PRINT;
+    if (strcmp(value, "உள்ளீடு") == 0 || strcmp(value, "input") == 0) return T_INP;
+
+    // 3. தரவு வகைகள் / Data Types
+    if (strcmp(value, "எண்") == 0 || strcmp(value, "முழுஎண்") == 0 || strcmp(value, "Num") == 0) return T_INT;
+    if (strcmp(value, "வரி") == 0 || strcmp(value, "Str") == 0) return T_STR;
+    if (strcmp(value, "உண்மை") == 0 || strcmp(value, "bool") == 0) return T_BOOL;
+
+    // 4. கட்டுப்பாட்டு லாஜிக் / Logic Control
+    if (strcmp(value, "எனில்") == 0 || strcmp(value, "if") == 0) return T_IF;
+    if (strcmp(value, "இல்லையெனில்") == 0 || strcmp(value, "else") == 0) return T_ELSE;
+    if (strcmp(value, "சு") == 0 || strcmp(value, "for") == 0) return T_FOR;
+    if (strcmp(value, "சு2") == 0 || strcmp(value, "while") == 0) return T_WHILE;
+
+    // 5. இதர / Others
+    if (strcmp(value, "திரும்பு") == 0 || strcmp(value, "return") == 0) return T_RET;
+    if (strcmp(value, "இயக்கு") == 0 || strcmp(value, "call") == 0) return T_CALL;
+    if (strcmp(value, "வரிசை") == 0 || strcmp(value, "line") == 0) return T_LINE;
+
     return T_ID; 
 }
+
 Token get_next_token(FILE *file) {
     Token token;
     int c = fgetc(file);
 
-    // 1. Skip Whitespaces
     while (isspace(c)) c = fgetc(file);
 
     if (c == EOF) {
@@ -31,20 +43,21 @@ Token get_next_token(FILE *file) {
         return token;
     }
 
-    // 2. Handle Tamil Keywords & Identifiers
+    // தமிழ் மற்றும் ஆங்கில எழுத்துக்களைக் கையாளுதல் (UTF-8 Support)
+    // 127-க்கு மேல் இருந்தால் அது தமிழ் போன்ற யுனிகோடு எழுத்துக்கள்
     if (isalpha(c) || (unsigned char)c > 127) {
         int i = 0;
         do {
             token.value[i++] = c;
             c = fgetc(file);
-        } while (isalnum(c) || (unsigned char)c > 127 || c == '2'); 
+        } while (isalnum(c) || (unsigned char)c > 127 || c == '2' || c == '_'); 
         ungetc(c, file);
         token.value[i] = '\0';
         token.type = get_keyword_type(token.value);
         return token;
     }
 
-    // 3. Handle Numbers
+    // எண்களைக் கையாளுதல்
     if (isdigit(c)) {
         int i = 0;
         while (isdigit(c)) {
@@ -57,20 +70,21 @@ Token get_next_token(FILE *file) {
         return token;
     }
 
-    // 4. CRITICAL: Handle Symbols & Operators
+    // குறியீடுகள் (Symbols)
     token.value[0] = c;
     token.value[1] = '\0';
 
-    if (c == '(') token.type = 15;      // T_LPAREN
-    else if (c == ')') token.type = 16; // T_RPAREN
-    else if (c == ';') token.type = 17; // T_SEMI
-    else if (c == '<') token.type = 18; // T_LT
-    else if (c == '>') token.type = 21; // T_GT
-    else if (c == '+') token.type = 19; // T_PLUS
-    else if (c == '=') token.type = 20; // T_ASSIGN
-    else if (c == '{') token.type = 22; // T_LBRACE
-    else if (c == '}') token.type = 23; // T_RBRACE
-    else token.type = T_ID;             // Default to Identifier
+    if (c == '(') token.type = 15;
+    else if (c == ')') token.type = 16;
+    else if (c == ';') token.type = 17;
+    else if (c == '<') token.type = 18;
+    else if (c == '>') token.type = 21;
+    else if (c == '+') token.type = 19;
+    else if (c == '-') token.type = 56; // Minus symbol for line-1 logic
+    else if (c == '=') token.type = 20;
+    else if (c == '{') token.type = 22;
+    else if (c == '}') token.type = 23;
+    else token.type = T_ID;
 
     return token;
 }

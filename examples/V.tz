@@ -1,0 +1,4 @@
+Num p = 100
+Num c = 290
+print p 
+print c

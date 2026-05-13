@@ -4,24 +4,29 @@
 #include <stdio.h>
 #include "lexer.h"
 
-// AST Node vagaigal (Types of nodes in our tree)
+// AST Node வகைகள் (NodeType)
 typedef enum {
-    NODE_VAR_DECL,   // Variable declaration (e.g., எண் i = 0)
-    NODE_PRINT,      // Output (e.g., கூறு)
-    NODE_BINARY_OP,  // Math operations (+, -, *, /)
-    NODE_LOOP        // Loop logic (e.g., சு)
+    NODE_VAR_DECL,   
+    NODE_PRINT,      
+    NODE_BINARY_OP,  
+    NODE_LOOP,
+    NODE_FUNC_DEF,   
+    NODE_FUNC_CALL   
 } NodeType;
 
-// Abstract Syntax Tree Structure
+// AST Structure
 typedef struct ASTNode {
-    NodeType type;          // Node-oda vagai
-    Token token;            // Intha node-kulla irukira token (value/name)
-    struct ASTNode *left;   // Idathu pakkam branch
-    struct ASTNode *right;  // Valathu pakkam branch
+    NodeType type;          
+    Token token;            
+    struct ASTNode *left;   
+    struct ASTNode *right;  
 } ASTNode;
 
 // Function declarations
-void parse(FILE *file);                      // Parser-a start panna
-ASTNode* create_node(NodeType type, Token t); // Puthu node create panna
+void parse(FILE *file);                      
+ASTNode* create_node(NodeType type, Token t); 
+
+// பழைய expect மற்றும் parse_expression வரிகளை இங்கே நீக்கிவிட்டோம் 
+// ஏென்றால் அவை parser.c-ல் இப்போது இல்லை.
 
 #endif
