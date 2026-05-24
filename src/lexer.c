@@ -2,6 +2,9 @@
 #include <string.h>
 #include <ctype.h>
 
+// 🌟 உலகளாவிய வரி எண் மாறி (Global Line Counter)
+int current_line = 1;
+
 T_Type get_keyword_type(char* value) {
     // 1. அமைப்பு / Structure
     if (strcmp(value, "முதன்மை") == 0 || strcmp(value, "main") == 0) return T_MAIN;
@@ -35,7 +38,33 @@ Token get_next_token(FILE *file) {
     Token token;
     int c = fgetc(file);
 
-    while (isspace(c)) c = fgetc(file);
+    // 🌟 ஒயிட்ஸ்பேஸ்களை கடக்கும்போது புதிய வரிகளை துல்லியமாக கணக்கிடும் வளையம்
+    while (isspace(c)) {
+        if (c == '\n') {
+            current_line++;
+        }
+        c = fgetc(file);
+    }
+
+    // 🌟 மாஸ்டர் பிக்ஸ்: சிங்கிள் லைன் கமெண்ட்களை (//) அப்படியே புறக்கணிக்கும் பாதுகாப்பு லேயர்
+    if (c == '/') {
+        int next_c = fgetc(file);
+        if (next_c == '/') {
+            // வரியின் இறுதி வரை அல்லது கோப்பின் இறுதி வரை அனைத்து எழுத்துக்களையும் புறக்கணி
+            while ((c = fgetc(file)) != '\n' && c != EOF);
+            if (c == '\n') {
+                current_line++;
+            }
+            // கமெண்ட் வரி முடிந்ததும், அடுத்த வரியில் இருக்கும் உண்மையான டோக்கனை எடுக்க மீண்டும் அழைக்கிறோம்
+            return get_next_token(file);
+        } else {
+            // ஒருவேளை அது கமெண்ட் இல்லை, வெறும் வகுத்தல் குறியீடு '/' என்றால் பழையபடி திருப்பி அனுப்பு
+            ungetc(next_c, file);
+        }
+    }
+
+    // தற்போதைய டோக்கன் எந்த வரியில் இருக்கிறது என்பதை டோக்கன் ஸ்ட்ரக்சரில் லாக் செய்கிறோம்
+    token.line = current_line;
 
     if (c == EOF) {
         token.type = T_EOF;
@@ -43,25 +72,46 @@ Token get_next_token(FILE *file) {
         return token;
     }
 
-    // தமிழ் மற்றும் ஆங்கில எழுத்துக்களைக் கையாளுதல் (UTF-8 Support)
-    // 127-க்கு மேல் இருந்தால் அது தமிழ் போன்ற யுனிகோடு எழுத்துக்கள்
-    if (isalpha(c) || (unsigned char)c > 127) {
+    // 🧵 சரங்களைக் கையாளுதல் (String Literals)
+    if (c == '"') {
+        int i = 0;
+        while ((c = fgetc(file)) != '"' && c != EOF) {
+            if (c == '\n') current_line++; // ஸ்ட்ரிங்கிற்குள் புதிய வரி இருந்தாலும் கணக்கிடும்
+            
+            // 🌟 பஃபர் பாதுகாப்பு அடுக்கு (Segmentation Fault வராமல் தடுக்கிறது)
+            if (i < 1023) {
+                token.value[i++] = c;
+            }
+        }
+        token.value[i] = '\0';
+        token.type = T_STR; 
+        return token;
+    }
+
+    // 🌟 மாஸ்டர் யூனிகோட் ஃபிக்ஸ்: தமிழ் மற்றும் ஆங்கில எழுத்துக்கள் (Identifiers / Keywords)
+    if (isalpha(c) || (unsigned char)c >= 128 || c == '_') {
         int i = 0;
         do {
-            token.value[i++] = c;
+            // 🌟 பஃபர் பாதுகாப்பு அடுக்கு
+            if (i < 1023) {
+                token.value[i++] = c;
+            }
             c = fgetc(file);
-        } while (isalnum(c) || (unsigned char)c > 127 || c == '2' || c == '_'); 
+        } while (isalpha(c) || isdigit(c) || (unsigned char)c >= 128 || c == '_'); 
         ungetc(c, file);
         token.value[i] = '\0';
         token.type = get_keyword_type(token.value);
         return token;
     }
 
-    // எண்களைக் கையாளுதல்
+    // எண்களைக் கையாளுதல் (Numbers)
     if (isdigit(c)) {
         int i = 0;
         while (isdigit(c)) {
-            token.value[i++] = c;
+            // 🌟 பஃபர் பாதுகாப்பு அடுக்கு
+            if (i < 1023) {
+                token.value[i++] = c;
+            }
             c = fgetc(file);
         }
         ungetc(c, file);
@@ -76,11 +126,11 @@ Token get_next_token(FILE *file) {
 
     if (c == '(') token.type = 15;
     else if (c == ')') token.type = 16;
-    else if (c == ';') token.type = 17;
+    else if (c == ';') token.type = 21; 
     else if (c == '<') token.type = 18;
-    else if (c == '>') token.type = 21;
+    else if (c == '>') token.type = 24; 
     else if (c == '+') token.type = 19;
-    else if (c == '-') token.type = 56; // Minus symbol for line-1 logic
+    else if (c == '-') token.type = 56; 
     else if (c == '=') token.type = 20;
     else if (c == '{') token.type = 22;
     else if (c == '}') token.type = 23;
